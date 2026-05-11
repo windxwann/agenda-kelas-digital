@@ -1,0 +1,491 @@
+{{-- resources/views/admin/students/index.blade.php --}}
+@extends('layouts.admin')
+
+@section('title', 'Manajemen Siswa')
+@section('header', 'Manajemen Siswa')
+
+@section('content')
+<div class="space-y-8 pb-8">
+    <!-- Header Section -->
+    <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-6 mb-6">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Data Siswa</h1>
+            <p class="mt-2 text-base text-gray-500 max-w-2xl leading-relaxed">
+                Kelola data siswa, import/export, dan pantau statistik kehadiran secara real-time.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center bg-white border border-gray-200 rounded-2xl p-1.5 shadow-sm">
+                <button onclick="openImportModal()" 
+                        class="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200">
+                    <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                    Import
+                </button>
+                <div class="w-px h-6 bg-gray-200 mx-1"></div>
+                <a href="{{ route('admin.students.export.template') }}" 
+                   class="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200">
+                    <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Template
+                </a>
+            </div>
+
+            <a href="{{ route(request()->segment(1) . '.students.bulk-graduation') }}" 
+               class="inline-flex items-center px-6 py-3 text-sm font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-2xl hover:bg-indigo-100 transition-all shadow-sm">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                Kelulusan Massal
+            </a>
+
+            <a href="{{ route('admin.students.create') }}" 
+               class="inline-flex items-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl transition-all duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Tambah Siswa
+            </a>
+        </div>
+    </div>
+    
+    <!-- Statistik Cepat -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-2">
+        <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 group hover:border-blue-500 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Siswa</p>
+                    <p class="text-3xl font-black text-gray-900 mt-1">{{ $students->total() }}</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 group hover:border-green-500 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Kelas</p>
+                    <p class="text-3xl font-black text-gray-900 mt-1">{{ is_countable($classList) ? count($classList) : 0 }}</p>
+                </div>
+                <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 group hover:border-amber-500 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Laki-laki</p>
+                    <p class="text-3xl font-black text-gray-900 mt-1">{{ $maleCount ?? 0 }}</p>
+                </div>
+                <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 group hover:border-purple-500 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Perempuan</p>
+                    <p class="text-3xl font-black text-gray-900 mt-1">{{ $femaleCount ?? 0 }}</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-2">
+        <form method="GET" action="{{ route('admin.students.index') }}" class="flex flex-col lg:flex-row gap-4">
+            <!-- Search Input -->
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       placeholder="Cari nama atau NIS siswa..." 
+                       class="block w-full pl-12 pr-4 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
+            </div>
+
+            <!-- Dropdown Filters Group -->
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
+                <!-- Filter Kelas -->
+                <div class="relative w-full sm:w-48">
+                    <select name="class_id" onchange="this.form.submit()" 
+                            class="appearance-none block w-full pl-4 pr-10 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
+                        <option value="">Semua Kelas</option>
+                        @foreach($classList as $class)
+                            <option value="{{ $class->id }}" {{ request('class_id') == $class->id ? 'selected' : '' }}>
+                                {{ $class->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Filter Gender -->
+                <div class="relative w-full sm:w-40">
+                    <select name="gender" onchange="this.form.submit()" 
+                            class="appearance-none block w-full pl-4 pr-10 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
+                        <option value="">Gender</option>
+                        <option value="L" {{ request('gender') == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="P" {{ request('gender') == 'P' ? 'selected' : '' }}>Perempuan</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Filter Status -->
+                <div class="relative w-full sm:w-40">
+                    <select name="status" onchange="this.form.submit()" 
+                            class="appearance-none block w-full pl-4 pr-10 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
+                        <option value="">Status</option>
+                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                        <option value="graduated" {{ request('status') == 'graduated' ? 'selected' : '' }}>Lulus</option>
+                        <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Non-Aktif</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Reset Button -->
+                @if(request()->anyFilled(['search', 'class_id', 'gender', 'status']))
+                    <a href="{{ route('admin.students.index') }}" 
+                       class="inline-flex items-center justify-center p-3 text-red-500 hover:bg-red-50 rounded-xl transition-all" 
+                       title="Reset Filter">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </a>
+                @endif
+            </div>
+        </form>
+        
+        <!-- Info Hasil Pencarian -->
+        @if(request('search') || request('class_id') || request('gender'))
+            <div class="mt-3 text-sm text-gray-600">
+                Menampilkan {{ $students->count() }} dari {{ $students->total() }} siswa
+                @if(request('search'))
+                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-800 ml-2">
+                        Pencarian: {{ request('search') }}
+                    </span>
+                @endif
+                @if(request('class_id'))
+                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-800 ml-2">
+                        Kelas terpilih
+                    </span>
+                @endif
+            </div>
+        @endif
+    </div>
+    
+    <!-- Tabel Siswa dengan Scroll -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto" style="max-height: 60vh; overflow-y: auto;">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50 sticky top-0 z-10 border-b border-gray-200 shadow-sm">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-24">NIS</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider min-w-[200px]">Nama Siswa</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-32">Kelas</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-32">Gender</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-24">Status</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-24">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100">
+                    @forelse($students as $student)
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-mono font-bold bg-gray-100 text-gray-700 rounded-lg border border-gray-200">
+                                {{ $student->nis }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 text-xs font-bold mr-3">
+                                    {{ strtoupper(substr($student->name, 0, 1)) }}
+                                </div>
+                                <div class="text-sm font-bold text-gray-900">{{ $student->name }}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 rounded-lg">
+                                {{ $student->class->name ?? 'Belum ada kelas' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($student->gender == 'L')
+                                <span class="px-3 py-1 text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 rounded-lg">Laki-laki</span>
+                            @elseif($student->gender == 'P')
+                                <span class="px-3 py-1 text-xs font-bold bg-pink-50 text-pink-700 border border-pink-100 rounded-lg">Perempuan</span>
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($student->status == 'active')
+                                <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-green-50 text-green-700 border border-green-100">
+                                    <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-green-500"></span>
+                                    Aktif
+                                </span>
+                            @elseif($student->status == 'graduated')
+                                <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                    <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-indigo-500"></span>
+                                    Lulus
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 border border-red-100">
+                                    <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-red-500"></span>
+                                    Non-Aktif
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <div class="flex space-x-3">
+                                <a href="{{ route('admin.students.show', $student) }}" class="text-gray-400 hover:text-blue-600 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </a>
+                                <a href="{{ route('admin.students.edit', $student) }}" class="text-gray-400 hover:text-green-600 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </a>
+                                <form action="{{ route('admin.students.destroy', $student) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus siswa {{ $student->name }}?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-gray-400 hover:text-red-600 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-20 text-center">
+                            <div class="flex flex-col items-center text-gray-400">
+                                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                <p class="text-lg font-medium">Belum ada data siswa</p>
+                                <a href="{{ route('admin.students.create') }}" class="mt-4 text-blue-600 hover:underline">Tambah siswa baru</a>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination dengan Info -->
+        @if($students->hasPages())
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="text-sm text-gray-500 font-medium">
+                Menampilkan {{ $students->firstItem() }} - {{ $students->lastItem() }} dari {{ $students->total() }} siswa
+            </div>
+            <div>
+                {{ $students->appends(request()->query())->links() }}
+            </div>
+        </div>
+        @endif
+    </div>
+</div>
+
+<!-- Modal Import Excel -->
+<div id="importModal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen p-4 text-center">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" onclick="closeImportModal()"></div>
+        
+        <!-- Modal Panel -->
+        <div class="relative w-full max-w-lg transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all">
+            <form action="{{ route('admin.students.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="bg-white px-6 pt-6 pb-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900" id="modal-title">
+                            Import Data Siswa
+                        </h3>
+                        <button type="button" onclick="closeImportModal()" class="text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg p-1.5 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-500 transition-all hover:bg-blue-50 cursor-pointer group"
+                             onclick="document.getElementById('file').click()">
+                            <input type="file" name="file" id="file" class="hidden" accept=".xlsx,.xls,.csv" required>
+                            <div class="w-16 h-16 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-700 font-medium">Klik untuk pilih file atau drag and drop</p>
+                            <p class="text-sm text-gray-500 mt-2">Format: .xlsx, .xls, .csv (Max 2MB)</p>
+                            <div id="fileName" class="mt-4 text-sm font-semibold text-blue-600 bg-blue-50 py-2 px-4 rounded-lg hidden"></div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-amber-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <p class="text-sm text-amber-800 leading-relaxed">
+                                    <strong>Petunjuk:</strong> Pastikan file Excel memiliki kolom: NIS, NAMA, GENDER, KELAS, ALAMAT. (Email akan digenerate otomatis berdasarkan NIS)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+                    <button type="button" onclick="closeImportModal()" 
+                            class="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit" 
+                            class="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-sm transition-colors">
+                        Import Sekarang
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    function openImportModal() {
+        document.getElementById('importModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeImportModal() {
+        document.getElementById('importModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        // Reset file input
+        document.getElementById('file').value = '';
+        document.getElementById('fileName').classList.add('hidden');
+    }
+    
+    // Tampilkan nama file yang dipilih
+    document.getElementById('file')?.addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name;
+        const fileNameSpan = document.getElementById('fileName');
+        if (fileName) {
+            fileNameSpan.textContent = `✓ ${fileName}`;
+            fileNameSpan.classList.remove('hidden');
+        } else {
+            fileNameSpan.classList.add('hidden');
+        }
+    });
+    
+    // Tutup modal dengan ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeImportModal();
+        }
+    });
+    
+    // Drag and drop untuk modal import
+    const dropZone = document.querySelector('#importModal .border-2');
+    if (dropZone) {
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('border-blue-500', 'bg-blue-50');
+        });
+        
+        dropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('border-blue-500', 'bg-blue-50');
+        });
+        
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('border-blue-500', 'bg-blue-50');
+            const file = e.dataTransfer.files[0];
+            const fileInput = document.getElementById('file');
+            fileInput.files = e.dataTransfer.files;
+            
+            // Trigger change event
+            const event = new Event('change', { bubbles: true });
+            fileInput.dispatchEvent(event);
+        });
+    }
+</script>
+@endpush
+@push('scripts')
+<script>
+    // Real-time Polling Logic
+    // Kita akan melakukan "Smart Refresh" hanya jika ada perubahan di halaman lain
+    let currentDataState = "";
+
+    function calculateState() {
+        // Ambil representasi singkat dari baris tabel saat ini
+        const rows = document.querySelectorAll('tbody tr');
+        return Array.from(rows).map(row => row.innerText.trim()).join('|');
+    }
+
+    async function pollData() {
+        try {
+            // Kita fetch halaman yang sama secara silent
+            const response = await fetch(window.location.href, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const html = await response.text();
+            
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Update Statistik
+            const newStats = doc.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4');
+            const oldStats = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4');
+            if (newStats && oldStats && newStats.innerHTML !== oldStats.innerHTML) {
+                oldStats.innerHTML = newStats.innerHTML;
+            }
+
+            // Update Tabel
+            const newTable = doc.querySelector('table');
+            const oldTable = document.querySelector('table');
+            if (newTable && oldTable && newTable.innerHTML !== oldTable.innerHTML) {
+                oldTable.innerHTML = newTable.innerHTML;
+                oldTable.closest('.overflow-x-auto').classList.add('bg-blue-50');
+                setTimeout(() => oldTable.closest('.overflow-x-auto').classList.remove('bg-blue-50'), 1000);
+            }
+        } catch (e) {
+            // Silent error
+        }
+    }
+
+    // Jalankan polling setiap 15 detik (lebih responsif)
+    setInterval(pollData, 15000);
+</script>
+@endpush
+@endsection

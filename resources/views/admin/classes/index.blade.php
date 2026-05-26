@@ -21,6 +21,36 @@
         </a>
     </div>
 
+    <!-- Filter & Search Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+        <form method="GET" action="{{ route('admin.classes.index') }}" class="flex flex-col lg:flex-row gap-4">
+            <!-- Search Input -->
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       placeholder="Cari nama kelas atau tahun ajaran..." 
+                       class="block w-full pl-12 pr-4 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
+            </div>
+
+            <!-- Reset Button -->
+            @if(request()->filled('search'))
+                <div class="flex items-center">
+                    <a href="{{ route('admin.classes.index') }}" 
+                       class="inline-flex items-center justify-center px-4 py-3.5 text-sm font-semibold text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Reset Pencarian
+                    </a>
+                </div>
+            @endif
+        </form>
+    </div>
+
     <!-- Tabel Kelas -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
@@ -39,7 +69,7 @@
                         <tr class="hover:bg-gray-50/50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-bold text-gray-900">{{ $class->name }}</div>
-                                <div class="text-[10px] text-gray-400">ID: #CLS-{{ $class->id }}</div>
+                                <div class="text-[10px] text-gray-400">TA: {{ $class->academic_year }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-3 py-1 text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 rounded-lg">
@@ -95,7 +125,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-20 text-center">
+                            <td colspan="6" class="px-6 py-20 text-center">
                                 <div class="flex flex-col items-center text-gray-400">
                                     <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
@@ -111,8 +141,13 @@
         </div>
         
         @if($classList->hasPages())
-        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
-            {{ $classList->links() }}
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="text-sm text-gray-500 font-medium">
+                Menampilkan {{ $classList->firstItem() }} - {{ $classList->lastItem() }} dari {{ $classList->total() }} kelas
+            </div>
+            <div>
+                {{ $classList->appends(request()->query())->links() }}
+            </div>
         </div>
         @endif
     </div>

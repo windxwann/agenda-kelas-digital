@@ -8,12 +8,33 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
+use App\Models\Classes;
+
 class StudentsTemplateExport implements FromCollection, WithHeadings, WithStyles
 {
     public function collection()
     {
+        // Ambil nama kelas yang nyata dan aktif di database sebagai contoh agar tidak terjadi error pencocokan kelas
+        $sampleClass = Classes::where('is_active', true)->first() ?? Classes::first();
+        $sampleClassName = $sampleClass ? $sampleClass->name : 'X RPL 1';
+
         return collect([
-            ['Ahmad Wijaya', 'ahmad@student.com', '2024001', 'XII IPA 1', '08123456789', 'Jl. Pendidikan No. 1'],
+            [
+                'Ahmad Wijaya',
+                '2024001',
+                'L',
+                '0098765432',
+                'Bandung',
+                '2008-05-15',
+                'Jl. Merdeka No. 10',
+                '03',
+                '05',
+                'Babakan Ciamis',
+                'Sumur Bandung',
+                '081234567891',
+                'siswa@school.com',
+                $sampleClassName
+            ],
         ]);
     }
     
@@ -21,11 +42,19 @@ class StudentsTemplateExport implements FromCollection, WithHeadings, WithStyles
     {
         return [
             'NAMA',
-            'EMAIL',
             'NIS',
-            'KELAS',
-            'TELEPON',
-            'ALAMAT'
+            'GENDER',
+            'NISN',
+            'TEMPAT LAHIR',
+            'TANGGAL LAHIR',
+            'ALAMAT',
+            'RT',
+            'RW',
+            'KELURAHAN',
+            'KECAMATAN',
+            'NO TELEPON',
+            'EMAIL',
+            'KELAS'
         ];
     }
     

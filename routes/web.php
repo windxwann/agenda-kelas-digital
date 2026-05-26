@@ -33,6 +33,7 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('su
     Route::get('students/export/template', [StudentController::class, 'exportTemplate'])->name('students.export.template');
     Route::get('students/bulk-graduation', [StudentController::class, 'bulkGraduation'])->name('students.bulk-graduation');
     Route::post('students/process-bulk-graduation', [StudentController::class, 'processBulkGraduation'])->name('students.process-bulk-graduation');
+    Route::delete('students/bulk-delete', [StudentController::class, 'bulkDelete'])->name('students.bulk-delete');
     Route::resource('students', StudentController::class);
     
     // Manajemen Guru
@@ -58,6 +59,20 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('su
     
     // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+    // Profile & Settings
+    Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings');
+    Route::post('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+
+    // Notifications API
+    Route::get('/api/notifications', function() {
+        return response()->json([
+            ['id' => 1, 'title' => 'Sistem Diperbarui', 'message' => 'Fitur real-time aktif.', 'time' => 'Baru saja'],
+            ['id' => 2, 'title' => 'Agenda Baru', 'message' => 'Kelas XII IPA 1 menambahkan agenda.', 'time' => '5 menit yang lalu']
+        ]);
+    })->name('notifications.api');
 });
 
 // Admin Routes (Kepala Sekolah)
@@ -73,6 +88,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('students/export/template', [StudentController::class, 'exportTemplate'])->name('students.export.template');
     Route::get('students/bulk-graduation', [StudentController::class, 'bulkGraduation'])->name('students.bulk-graduation');
     Route::post('students/process-bulk-graduation', [StudentController::class, 'processBulkGraduation'])->name('students.process-bulk-graduation');
+    Route::delete('students/bulk-delete', [StudentController::class, 'bulkDelete'])->name('students.bulk-delete');
     Route::resource('students', StudentController::class);
     
     // Manajemen Guru
@@ -96,6 +112,20 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     
     // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+    // Profile & Settings
+    Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings');
+    Route::post('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+
+    // Notifications API
+    Route::get('/api/notifications', function() {
+        return response()->json([
+            ['id' => 1, 'title' => 'Sistem Diperbarui', 'message' => 'Fitur real-time aktif.', 'time' => 'Baru saja'],
+            ['id' => 2, 'title' => 'Agenda Baru', 'message' => 'Kelas XII IPA 1 menambahkan agenda.', 'time' => '5 menit yang lalu']
+        ]);
+    })->name('notifications.api');
 });
 
 // Sekretaris Routes
@@ -103,15 +133,18 @@ Route::middleware(['auth', 'role:sekretaris'])->prefix('sekretaris')->name('sekr
     Route::get('/dashboard', [App\Http\Controllers\Sekretaris\DashboardController::class, 'index'])->name('dashboard');
     
     // Agenda Kelas
+    Route::get('/agenda/get-schedule-info', [App\Http\Controllers\Sekretaris\AgendaController::class, 'getScheduleInfo'])->name('agenda.get-schedule-info');
     Route::get('/agenda', [App\Http\Controllers\Sekretaris\AgendaController::class, 'index'])->name('agenda.index');
     Route::get('/agenda/create', [App\Http\Controllers\Sekretaris\AgendaController::class, 'create'])->name('agenda.create');
     Route::post('/agenda', [App\Http\Controllers\Sekretaris\AgendaController::class, 'store'])->name('agenda.store');
     Route::get('/agenda/{agenda}/edit', [App\Http\Controllers\Sekretaris\AgendaController::class, 'edit'])->name('agenda.edit');
     Route::put('/agenda/{agenda}', [App\Http\Controllers\Sekretaris\AgendaController::class, 'update'])->name('agenda.update');
     Route::delete('/agenda/{agenda}', [App\Http\Controllers\Sekretaris\AgendaController::class, 'destroy'])->name('agenda.destroy');
+    Route::get('/agenda/{id}/preview', [App\Http\Controllers\Sekretaris\AgendaController::class, 'preview'])->name('agenda.preview');
     
     // Presensi Siswa
     Route::get('/attendance', [App\Http\Controllers\Sekretaris\AttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('/attendance/store', function() { return redirect()->route('sekretaris.attendance.index'); });
     Route::post('/attendance/store', [App\Http\Controllers\Sekretaris\AttendanceController::class, 'store'])->name('attendance.store');
     Route::get('/attendance/report', [App\Http\Controllers\Sekretaris\AttendanceController::class, 'report'])->name('attendance.report');
     
@@ -138,6 +171,10 @@ Route::middleware(['auth', 'role:wali_kelas'])->prefix('wali-kelas')->name('wali
     // Export Laporan
     Route::get('/export/attendance', [App\Http\Controllers\WaliKelas\ExportController::class, 'exportAttendance'])->name('export.attendance');
     Route::get('/export/attendance/pdf', [App\Http\Controllers\WaliKelas\ExportController::class, 'exportAttendancePDF'])->name('export.attendance.pdf');
+
+    // Profile
+    Route::get('/profile', [App\Http\Controllers\Guru\ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [App\Http\Controllers\Guru\ProfileController::class, 'update'])->name('profile.update');
 });
 
 // Wakasek Kurikulum Routes
@@ -158,6 +195,10 @@ Route::middleware(['auth', 'role:wakasek_kurikulum'])->prefix('wakasek-kurikulum
     
     // Export Data
     Route::get('/export/teaching', [App\Http\Controllers\Wakasek\ExportController::class, 'exportTeaching'])->name('export.teaching');
+
+    // Profile
+    Route::get('/profile', [App\Http\Controllers\Guru\ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [App\Http\Controllers\Guru\ProfileController::class, 'update'])->name('profile.update');
 });
 
 // Siswa Routes
@@ -166,15 +207,43 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     
     // Agenda Kelas
     Route::get('/agenda', [App\Http\Controllers\Siswa\AgendaController::class, 'index'])->name('agenda.index');
-    Route::get('/agenda/{agenda}', [App\Http\Controllers\Siswa\AgendaController::class, 'show'])->name('agenda.show');
+    Route::get('/agenda/{id}/json', [App\Http\Controllers\Siswa\AgendaController::class, 'showJson'])->name('agenda.json');
     
     // Jadwal Pelajaran
     Route::get('/schedule', [App\Http\Controllers\Siswa\ScheduleController::class, 'index'])->name('schedule.index');
-    Route::get('/schedule/calendar', [App\Http\Controllers\Siswa\ScheduleController::class, 'calendar'])->name('schedule.calendar');
+    Route::get('/schedule/by-date', [App\Http\Controllers\Siswa\ScheduleController::class, 'byDate'])->name('schedule.by-date');
+    Route::get('/schedule/change-week', [App\Http\Controllers\Siswa\ScheduleController::class, 'changeWeek'])->name('schedule.change-week');
+    Route::get('/schedule/today-date', [App\Http\Controllers\Siswa\ScheduleController::class, 'todayDate'])->name('schedule.today-date');
     
     // Presensi Pribadi
     Route::get('/attendance', [App\Http\Controllers\Siswa\AttendanceController::class, 'index'])->name('attendance.index');
-    Route::get('/attendance/history', [App\Http\Controllers\Siswa\AttendanceController::class, 'history'])->name('attendance.history');
+});
+
+// Guru Routes
+Route::middleware(['auth', 'role:teacher'])->prefix('guru')->name('guru.')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\Guru\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Presensi
+    Route::get('/attendance', [App\Http\Controllers\Guru\AttendanceController::class, 'index'])->name('attendance.index');
+    Route::post('/attendance', [App\Http\Controllers\Guru\AttendanceController::class, 'store'])->name('attendance.store');
+    
+    // Agenda / Jurnal Mengajar
+    Route::get('/agenda/get-schedule-info', [App\Http\Controllers\Guru\AgendaController::class, 'getScheduleInfo'])->name('agenda.get-schedule-info');
+    Route::get('/agenda', [App\Http\Controllers\Guru\AgendaController::class, 'index'])->name('agenda.index');
+    Route::get('/agenda/create', [App\Http\Controllers\Guru\AgendaController::class, 'create'])->name('agenda.create');
+    Route::post('/agenda', [App\Http\Controllers\Guru\AgendaController::class, 'store'])->name('agenda.store');
+    Route::get('/agenda/{agenda}', [App\Http\Controllers\Guru\AgendaController::class, 'show'])->name('agenda.show');
+
+    // Jurnal Guru (Alias for convenience if needed, but agenda is the primary term)
+    Route::get('/journal', [App\Http\Controllers\Guru\AgendaController::class, 'index'])->name('journal.index');
+
+    // Laporan
+    Route::get('/report', [App\Http\Controllers\Guru\ReportController::class, 'index'])->name('report.index');
+    Route::get('/report/export', [App\Http\Controllers\Guru\ReportController::class, 'export'])->name('report.export');
+
+    // Profile
+    Route::get('/profile', [App\Http\Controllers\Guru\ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [App\Http\Controllers\Guru\ProfileController::class, 'update'])->name('profile.update');
 });
 
 // Route untuk user yang sudah login tapi role tidak terdeteksi
@@ -193,6 +262,8 @@ Route::middleware(['auth'])->get('/dashboard', function () {
         return redirect()->route('wakasek-kurikulum.dashboard');
     } elseif ($user->hasRole('siswa')) {
         return redirect()->route('siswa.dashboard');
+    } elseif ($user->hasRole('teacher')) {
+        return redirect()->route('guru.dashboard');
     }
     
     return redirect('/login');

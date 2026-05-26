@@ -157,6 +157,10 @@
                             <p class="text-gray-500">admin@school.com</p>
                         </div>
                         <div class="bg-gray-50 rounded-lg p-2 text-center">
+                            <p class="font-semibold text-gray-700">Sekretaris</p>
+                            <p class="text-gray-500">sekretaris@school.com</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 text-center">
                             <p class="font-semibold text-gray-700">Guru</p>
                             <p class="text-gray-500">guru@school.com</p>
                         </div>

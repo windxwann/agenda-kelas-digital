@@ -40,7 +40,9 @@
                             </svg>
                         </div>
                         <div>
-                            <h1 class="text-xl font-bold text-gray-800">Agenda<span class="text-blue-600">Digital</span></h1>
+                            <h1 class="text-xl font-bold text-gray-800">
+                                {{ \App\Models\Setting::get('school_name', 'Agenda') }}<span class="text-blue-600">{{ \App\Models\Setting::get('school_name') ? '' : 'Digital' }}</span>
+                            </h1>
                             <p class="text-xs text-gray-500">Sistem Informasi Sekolah</p>
                         </div>
                     </div>
@@ -52,68 +54,71 @@
                 </div>
                 
                 <!-- Navigation -->
+                @php
+                    $routePrefix = Auth::user()->hasRole('super_admin') ? 'super-admin.' : 'admin.';
+                @endphp
                 <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-                    <a href="{{ route('admin.dashboard') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-600' : '' }}">
+                    <a href="{{ route($routePrefix . 'dashboard') }}" 
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'dashboard') ? 'bg-blue-50 text-blue-600' : '' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
                         <span class="ml-3 font-medium">Dashboard</span>
-                        @if(request()->routeIs('admin.dashboard'))
+                        @if(request()->routeIs($routePrefix . 'dashboard'))
                             <span class="ml-auto w-1.5 h-8 bg-blue-600 rounded-full"></span>
                         @endif
                     </a>
                     
-                    <a href="{{ route('admin.classes.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('admin.classes.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                    <a href="{{ route($routePrefix . 'classes.index') }}" 
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'classes.*') ? 'bg-blue-50 text-blue-600' : '' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                         <span class="ml-3 font-medium">Kelas</span>
                     </a>
                     
-                    <a href="{{ route('admin.students.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('admin.students.index') ? 'bg-blue-50 text-blue-600' : '' }}">
+                    <a href="{{ route($routePrefix . 'students.index') }}" 
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'students.index') ? 'bg-blue-50 text-blue-600' : '' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
                         <span class="ml-3 font-medium">Data Siswa</span>
                     </a>
 
-                    <a href="{{ route('admin.students.bulk-graduation') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('admin.students.bulk-graduation') ? 'bg-blue-50 text-blue-600' : '' }}">
+                    <a href="{{ route($routePrefix . 'students.bulk-graduation') }}" 
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'students.bulk-graduation') ? 'bg-blue-50 text-blue-600' : '' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                         </svg>
                         <span class="ml-3 font-medium">Kelulusan Massal</span>
                     </a>
                     
-                    <a href="{{ route('admin.teachers.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('admin.teachers.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                    <a href="{{ route($routePrefix . 'teachers.index') }}" 
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'teachers.*') ? 'bg-blue-50 text-blue-600' : '' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         <span class="ml-3 font-medium">Guru</span>
                     </a>
                     
-                    <a href="{{ route('admin.subjects.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('admin.subjects.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                    <a href="{{ route($routePrefix . 'subjects.index') }}" 
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'subjects.*') ? 'bg-blue-50 text-blue-600' : '' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                         </svg>
                         <span class="ml-3 font-medium">Mata Pelajaran</span>
                     </a>
                     
-                    <a href="{{ route('admin.schedules.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('admin.schedules.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                    <a href="{{ route($routePrefix . 'schedules.index') }}" 
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'schedules.*') ? 'bg-blue-50 text-blue-600' : '' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                         <span class="ml-3 font-medium">Jadwal</span>
                     </a>
                     
-                    <a href="{{ route('admin.reports.attendance') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                    <a href="{{ route($routePrefix . 'reports.attendance') }}" 
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'reports.*') ? 'bg-blue-50 text-blue-600' : '' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
@@ -129,7 +134,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-semibold text-gray-900 truncate">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-gray-500 capitalize">{{ str_replace('_', ' ', Auth::user()->roles->first()->name) }}</p>
+                            <p class="text-xs text-gray-500 capitalize">{{ str_replace('_', ' ', Auth::user()->roles->first()?->name ?? 'Admin') }}</p>
                         </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -190,30 +195,7 @@
                                 </form>
                             </div>
                             
-                            <!-- Notifications -->
-                            <div class="relative" x-data="{ notifOpen: false }">
-                                <button @click="notifOpen = !notifOpen" class="relative text-gray-500 hover:text-gray-700">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                                    </svg>
-                                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                                </button>
-                                
-                                <div x-show="notifOpen" @click.away="notifOpen = false"
-                                     x-transition:enter="transition ease-out duration-200"
-                                     x-transition:enter-start="opacity-0 -translate-y-2"
-                                     x-transition:enter-end="opacity-100 translate-y-0"
-                                     class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-50">
-                                    <div class="p-4 border-b border-gray-100">
-                                        <h3 class="font-semibold text-gray-900">Notifikasi</h3>
-                                    </div>
-                                    <div class="max-h-96 overflow-y-auto">
-                                        <div class="p-4 hover:bg-gray-50 cursor-pointer">
-                                            <p class="text-sm text-gray-600">Tidak ada notifikasi baru</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
                             
                             <!-- Profile Dropdown -->
                             <div class="relative" x-data="{ profileOpen: false }">
@@ -232,8 +214,8 @@
                                      x-transition:enter-start="opacity-0 -translate-y-2"
                                      x-transition:enter-end="opacity-100 translate-y-0"
                                      class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-gray-100 z-50">
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profil Saya</a>
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Pengaturan</a>
+                                    <a href="{{ route(Auth::user()->hasRole('super_admin') ? 'super-admin.profile' : 'admin.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profil Saya</a>
+                                    <a href="{{ route(Auth::user()->hasRole('super_admin') ? 'super-admin.settings' : 'admin.settings') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Pengaturan</a>
                                     <hr class="my-1">
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf

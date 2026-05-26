@@ -111,8 +111,8 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-100">
                     @php
-                        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                        $dayNames = ['Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => "Jumat", 'Saturday' => 'Sabtu'];
+                        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                        $dayNames = ['Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => "Jumat"];
                     @endphp
                     @foreach($days as $day)
                     <div class="bg-white p-6">
@@ -121,7 +121,10 @@
                             @forelse($class->schedules->where('day', $day)->sortBy('start_time') as $schedule)
                                 <div class="flex justify-between text-xs">
                                     <span class="font-semibold text-gray-900">{{ $schedule->subject->name }}</span>
-                                    <span class="text-gray-500">{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}</span>
+                                    <span class="text-gray-500">
+                                        {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - 
+                                        {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
+                                    </span>
                                 </div>
                             @empty
                                 <p class="text-[10px] text-gray-300 italic uppercase">Libur</p>
@@ -144,7 +147,7 @@
                             <h4 class="text-sm font-bold text-gray-900">{{ $agenda->title }}</h4>
                             <span class="text-[10px] font-bold text-gray-400 uppercase">{{ $agenda->date->translatedFormat('d M Y') }}</span>
                         </div>
-                        <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed">{{ $agenda->description }}</p>
+                        <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed">{{ strip_tags($agenda->description) }}</p>
                         <div class="mt-3 flex items-center text-[10px] text-gray-400 font-semibold uppercase">
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                             {{ $agenda->teacher->name }}

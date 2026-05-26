@@ -50,7 +50,6 @@
                             <option value="Wednesday" {{ old('day', $schedule->day) == 'Wednesday' ? 'selected' : '' }}>Rabu</option>
                             <option value="Thursday" {{ old('day', $schedule->day) == 'Thursday' ? 'selected' : '' }}>Kamis</option>
                             <option value="Friday" {{ old('day', $schedule->day) == 'Friday' ? 'selected' : '' }}>Jumat</option>
-                            <option value="Saturday" {{ old('day', $schedule->day) == 'Saturday' ? 'selected' : '' }}>Sabtu</option>
                         </select>
                         @error('day') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>

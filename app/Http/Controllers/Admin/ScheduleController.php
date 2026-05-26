@@ -36,7 +36,7 @@ class ScheduleController extends Controller
             ->groupBy('class_id');
             
         $classList = Classes::all();
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
         
         return view('admin.schedules.index', compact('schedules', 'classList', 'days'));
     }
@@ -49,7 +49,7 @@ class ScheduleController extends Controller
         $classList = Classes::all();
         $subjects = Subject::with('teacher')->get();
         $teachers = User::role('teacher')->get();
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
         
         return view('admin.schedules.create', compact('classList', 'subjects', 'teachers', 'days'));
     }
@@ -63,7 +63,7 @@ class ScheduleController extends Controller
             'class_id' => 'required|exists:classes,id',
             'subject_id' => 'required|exists:subjects,id',
             'teacher_id' => 'required|exists:users,id',
-            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
+            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'room' => 'nullable|string|max:50'
@@ -75,23 +75,55 @@ class ScheduleController extends Controller
                 ->withInput();
         }
 
-        // Cek jadwal bentrok
-        $conflict = Schedule::where('class_id', $request->class_id)
+        // Standardize time formats for precise database comparison (e.g., '09:30' to '09:30:00')
+        $startTime = strlen($request->start_time) === 5 ? $request->start_time . ':00' : $request->start_time;
+        $endTime = strlen($request->end_time) === 5 ? $request->end_time . ':00' : $request->end_time;
+
+        // 1. Cek bentrok kelas (kelas sudah memiliki pelajaran lain pada jam yang sama)
+        $classConflict = Schedule::where('class_id', $request->class_id)
             ->where('day', $request->day)
-            ->where(function($q) use ($request) {
-                $q->whereBetween('start_time', [$request->start_time, $request->end_time])
-                  ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
-                  ->orWhere(function($q2) use ($request) {
-                      $q2->where('start_time', '<=', $request->start_time)
-                         ->where('end_time', '>=', $request->end_time);
-                  });
+            ->where(function($q) use ($startTime, $endTime) {
+                $q->where('start_time', '<', $endTime)
+                  ->where('end_time', '>', $startTime);
             })
             ->exists();
             
-        if ($conflict) {
+        if ($classConflict) {
             return redirect()->back()
                 ->with('error', 'Jadwal bentrok dengan jadwal lain di kelas yang sama!')
                 ->withInput();
+        }
+
+        // 2. Cek bentrok guru (guru sudah memiliki jadwal mengajar di kelas lain pada jam yang sama)
+        $teacherConflict = Schedule::where('teacher_id', $request->teacher_id)
+            ->where('day', $request->day)
+            ->where(function($q) use ($startTime, $endTime) {
+                $q->where('start_time', '<', $endTime)
+                  ->where('end_time', '>', $startTime);
+            })
+            ->exists();
+
+        if ($teacherConflict) {
+            return redirect()->back()
+                ->with('error', 'Guru yang bersangkutan sudah memiliki jadwal mengajar di jam yang sama!')
+                ->withInput();
+        }
+
+        // 3. Cek bentrok ruangan (ruangan sudah digunakan untuk jadwal lain pada jam yang sama)
+        if ($request->filled('room')) {
+            $roomConflict = Schedule::where('room', $request->room)
+                ->where('day', $request->day)
+                ->where(function($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '<', $endTime)
+                      ->where('end_time', '>', $startTime);
+                })
+                ->exists();
+
+            if ($roomConflict) {
+                return redirect()->back()
+                    ->with('error', 'Ruangan sudah digunakan untuk jadwal lain pada jam yang sama!')
+                    ->withInput();
+            }
         }
 
         Schedule::create($request->all());
@@ -118,7 +150,7 @@ class ScheduleController extends Controller
         $classList = Classes::all();
         $subjects = Subject::with('teacher')->get();
         $teachers = User::role('teacher')->get();
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
         
         return view('admin.schedules.edit', compact('schedule', 'classList', 'subjects', 'teachers', 'days'));
     }
@@ -132,7 +164,7 @@ class ScheduleController extends Controller
             'class_id' => 'required|exists:classes,id',
             'subject_id' => 'required|exists:subjects,id',
             'teacher_id' => 'required|exists:users,id',
-            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
+            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'room' => 'nullable|string|max:50'
@@ -144,24 +176,58 @@ class ScheduleController extends Controller
                 ->withInput();
         }
 
-        // Cek jadwal bentrok (abaikan jadwal sendiri)
-        $conflict = Schedule::where('class_id', $request->class_id)
+        // Standardize time formats for precise database comparison (e.g., '09:30' to '09:30:00')
+        $startTime = strlen($request->start_time) === 5 ? $request->start_time . ':00' : $request->start_time;
+        $endTime = strlen($request->end_time) === 5 ? $request->end_time . ':00' : $request->end_time;
+
+        // 1. Cek bentrok kelas (kelas sudah memiliki pelajaran lain pada jam yang sama, abaikan jadwal sendiri)
+        $classConflict = Schedule::where('class_id', $request->class_id)
             ->where('day', $request->day)
             ->where('id', '!=', $schedule->id)
-            ->where(function($q) use ($request) {
-                $q->whereBetween('start_time', [$request->start_time, $request->end_time])
-                  ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
-                  ->orWhere(function($q2) use ($request) {
-                      $q2->where('start_time', '<=', $request->start_time)
-                         ->where('end_time', '>=', $request->end_time);
-                  });
+            ->where(function($q) use ($startTime, $endTime) {
+                $q->where('start_time', '<', $endTime)
+                  ->where('end_time', '>', $startTime);
             })
             ->exists();
             
-        if ($conflict) {
+        if ($classConflict) {
             return redirect()->back()
                 ->with('error', 'Jadwal bentrok dengan jadwal lain di kelas yang sama!')
                 ->withInput();
+        }
+
+        // 2. Cek bentrok guru (guru sudah memiliki jadwal mengajar di kelas lain pada jam yang sama, abaikan jadwal sendiri)
+        $teacherConflict = Schedule::where('teacher_id', $request->teacher_id)
+            ->where('day', $request->day)
+            ->where('id', '!=', $schedule->id)
+            ->where(function($q) use ($startTime, $endTime) {
+                $q->where('start_time', '<', $endTime)
+                  ->where('end_time', '>', $startTime);
+            })
+            ->exists();
+
+        if ($teacherConflict) {
+            return redirect()->back()
+                ->with('error', 'Guru yang bersangkutan sudah memiliki jadwal mengajar di jam yang sama!')
+                ->withInput();
+        }
+
+        // 3. Cek bentrok ruangan (ruangan sudah digunakan untuk jadwal lain pada jam yang sama, abaikan jadwal sendiri)
+        if ($request->filled('room')) {
+            $roomConflict = Schedule::where('room', $request->room)
+                ->where('day', $request->day)
+                ->where('id', '!=', $schedule->id)
+                ->where(function($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '<', $endTime)
+                      ->where('end_time', '>', $startTime);
+                })
+                ->exists();
+
+            if ($roomConflict) {
+                return redirect()->back()
+                    ->with('error', 'Ruangan sudah digunakan untuk jadwal lain pada jam yang sama!')
+                    ->withInput();
+            }
         }
 
         $schedule->update($request->all());

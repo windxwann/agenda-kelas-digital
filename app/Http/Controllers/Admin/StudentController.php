@@ -45,7 +45,7 @@ class StudentController extends Controller
             });
         }
         
-        $students = $query->latest()->paginate(10);
+        $students = $query->orderByRaw('LOWER(name) ASC')->paginate(50);
         $classList = Classes::all();
         
         // Statistik untuk dashboard index
@@ -76,7 +76,14 @@ class StudentController extends Controller
             'class_id' => 'required|exists:classes,id',
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:500',
-            'password' => 'required|string|min:6'
+            'password' => 'required|string|min:6',
+            'nisn' => 'nullable|string|max:20',
+            'tempat_lahir' => 'nullable|string|max:255',
+            'tanggal_lahir' => 'nullable|date',
+            'rt' => 'nullable|string|max:10',
+            'rw' => 'nullable|string|max:10',
+            'kelurahan' => 'nullable|string|max:255',
+            'kecamatan' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -96,6 +103,13 @@ class StudentController extends Controller
             'address' => $request->address,
             'password' => Hash::make($request->password),
             'email_verified_at' => now(),
+            'nisn' => $request->nisn,
+            'tempat_lahir' => $request->tempat_lahir,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'rt' => $request->rt,
+            'rw' => $request->rw,
+            'kelurahan' => $request->kelurahan,
+            'kecamatan' => $request->kecamatan,
         ]);
         
         $student->assignRole('siswa');
@@ -145,7 +159,14 @@ class StudentController extends Controller
             'status' => 'required|in:active,inactive,graduated',
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:500',
-            'password' => 'nullable|string|min:6'
+            'password' => 'nullable|string|min:6',
+            'nisn' => 'nullable|string|max:20',
+            'tempat_lahir' => 'nullable|string|max:255',
+            'tanggal_lahir' => 'nullable|date',
+            'rt' => 'nullable|string|max:10',
+            'rw' => 'nullable|string|max:10',
+            'kelurahan' => 'nullable|string|max:255',
+            'kecamatan' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -162,6 +183,17 @@ class StudentController extends Controller
         }
         
         $student->update($data);
+        
+        // Handle Role Sekretaris
+        if ($request->has('is_secretary')) {
+            if (!$student->hasRole('sekretaris')) {
+                $student->assignRole('sekretaris');
+            }
+        } else {
+            if ($student->hasRole('sekretaris')) {
+                $student->removeRole('sekretaris');
+            }
+        }
 
         $message = 'Siswa berhasil diperbarui!';
         if ($request->filled('password')) {
@@ -191,12 +223,23 @@ class StudentController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:2048'
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+            'class_id' => 'nullable|exists:classes,id'
         ]);
 
         try {
-            Excel::import(new StudentsImport, $request->file('file'));
-            return redirect()->back()->with('success', 'Data siswa berhasil diimport!');
+            $import = new StudentsImport($request->class_id);
+            Excel::import($import, $request->file('file'));
+            
+            $importedCount = $import->getImportedCount();
+            $skippedCount = $import->getSkippedCount();
+            
+            $message = "Data siswa berhasil diimport! Berhasil menyimpan {$importedCount} siswa.";
+            if ($skippedCount > 0) {
+                $message .= " ({$skippedCount} siswa dilewati karena NIS sudah terdaftar sebelumnya)";
+            }
+            
+            return redirect()->back()->with('success', $message);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal import data: ' . $e->getMessage());
         }
@@ -227,7 +270,7 @@ class StudentController extends Controller
             $students = User::role('siswa')
                 ->where('class_id', $selectedClassId)
                 ->where('status', 'active')
-                ->orderBy('name')
+                ->orderByRaw('LOWER(name) ASC')
                 ->get();
         }
         
@@ -250,5 +293,28 @@ class StudentController extends Controller
         $prefix = $request->segment(1);
         return redirect()->route($prefix . '.students.index')
             ->with('success', count($request->student_ids) . ' siswa berhasil dinyatakan lulus!');
+    }
+
+    /**
+     * Bulk delete selected students
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'student_ids'   => 'required|array|min:1',
+            'student_ids.*' => 'exists:users,id',
+        ]);
+
+        $students = User::role('siswa')->whereIn('id', $request->student_ids)->get();
+        $count = $students->count();
+
+        foreach ($students as $student) {
+            $student->removeRole('siswa');
+            $student->delete();
+        }
+
+        $prefix = $request->segment(1);
+        return redirect()->route($prefix . '.students.index')
+            ->with('success', "{$count} siswa berhasil dihapus!");
     }
 }

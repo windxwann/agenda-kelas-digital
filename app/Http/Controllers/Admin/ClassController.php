@@ -8,18 +8,27 @@ use App\Models\Classes;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class ClassController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $classList = Classes::with(['homeroomTeacher', 'students'])
-            ->withCount('students')
-            ->latest()
-            ->paginate(10);
+        $query = Classes::with(['homeroomTeacher', 'students'])
+            ->withCount('students');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('academic_year', 'like', "%{$search}%");
+            });
+        }
+
+        $classList = $query->latest()->paginate(10);
             
         return view('admin.classes.index', compact('classList'));
     }
@@ -39,7 +48,15 @@ class ClassController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:classes,name',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('classes')->where(function ($query) use ($request) {
+                    return $query->where('grade_level', $request->grade_level)
+                                 ->where('academic_year', $request->academic_year);
+                })
+            ],
             'grade_level' => 'required|in:X,XI,XII',
             'academic_year' => 'required|string',
             'homeroom_teacher_id' => 'nullable|exists:users,id',
@@ -54,6 +71,14 @@ class ClassController extends Controller
         }
 
         Classes::create($request->all());
+
+        // Assign wali_kelas role to the teacher
+        if ($request->homeroom_teacher_id) {
+            $teacher = User::find($request->homeroom_teacher_id);
+            if ($teacher && !$teacher->hasRole('wali_kelas')) {
+                $teacher->assignRole('wali_kelas');
+            }
+        }
 
         $prefix = $request->segment(1);
         return redirect()->route($prefix . '.classes.index')
@@ -85,7 +110,15 @@ class ClassController extends Controller
     public function update(Request $request, Classes $class)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:classes,name,' . $class->id,
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('classes')->where(function ($query) use ($request) {
+                    return $query->where('grade_level', $request->grade_level)
+                                 ->where('academic_year', $request->academic_year);
+                })->ignore($class->id)
+            ],
             'grade_level' => 'required|in:X,XI,XII',
             'academic_year' => 'required|string',
             'homeroom_teacher_id' => 'nullable|exists:users,id',
@@ -100,6 +133,14 @@ class ClassController extends Controller
         }
 
         $class->update($request->all());
+
+        // Assign wali_kelas role to the teacher
+        if ($request->homeroom_teacher_id) {
+            $teacher = User::find($request->homeroom_teacher_id);
+            if ($teacher && !$teacher->hasRole('wali_kelas')) {
+                $teacher->assignRole('wali_kelas');
+            }
+        }
 
         $prefix = $request->segment(1);
         return redirect()->route($prefix . '.classes.index')

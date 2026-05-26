@@ -24,7 +24,10 @@ class SearchController extends Controller
             ->where(function($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
                   ->orWhere('nis', 'like', "%{$query}%")
-                  ->orWhere('email', 'like', "%{$query}%");
+                  ->orWhere('email', 'like', "%{$query}%")
+                  ->orWhereHas('class', function($subQuery) use ($query) {
+                      $subQuery->where('academic_year', 'like', "%{$query}%");
+                  });
             })
             ->with('class')
             ->take(5)
@@ -41,6 +44,8 @@ class SearchController extends Controller
 
         // Search Classes
         $classes = Classes::where('name', 'like', "%{$query}%")
+            ->orWhere('academic_year', 'like', "%{$query}%")
+            ->with('homeroomTeacher')
             ->take(5)
             ->get();
 
@@ -58,13 +63,16 @@ class SearchController extends Controller
             ->take(5)
             ->get();
 
-        return view('admin.search_results', compact(
-            'query',
-            'students',
-            'teachers',
-            'classes',
-            'subjects',
-            'agendas'
-        ));
+        $totalResults = $students->count() + $teachers->count() + $classes->count() + $subjects->count() + $agendas->count();
+
+        return view('admin.search_results', [
+            'query' => $query,
+            'resultStudents' => $students,
+            'resultTeachers' => $teachers,
+            'resultClasses' => $classes,
+            'resultSubjects' => $subjects,
+            'resultAgendas' => $agendas,
+            'totalResults' => $totalResults
+        ]);
     }
 }

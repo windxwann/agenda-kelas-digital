@@ -40,10 +40,16 @@ class LoginController extends Controller
                 return redirect()->intended('/super-admin/dashboard');
             } elseif ($user->hasRole('admin')) {
                 return redirect()->intended('/admin/dashboard');
+            } elseif ($user->hasRole('wakasek_kurikulum')) {
+                return redirect()->intended('/wakasek-kurikulum/dashboard');
+            } elseif ($user->hasRole('wali_kelas')) {
+                return redirect()->intended('/wali-kelas/dashboard');
             } elseif ($user->hasRole('teacher')) {
-                return redirect()->intended('/teacher/dashboard');
-            } elseif ($user->hasRole('student')) {
-                return redirect()->intended('/student/dashboard');
+                return redirect()->intended('/guru/dashboard');
+            } elseif ($user->hasRole('sekretaris')) {
+                return redirect()->intended('/sekretaris/dashboard');
+            } elseif ($user->hasRole('siswa')) {
+                return redirect()->intended('/siswa/dashboard');
             }
             
             return redirect()->intended('/dashboard');

@@ -36,7 +36,7 @@ class DashboardController extends Controller
             'total_students' => User::role('siswa')->count(),
             'total_teachers' => User::role('teacher')->count(),
             'total_subjects' => Subject::count(),
-            'total_agendas_today' => Agenda::query()->whereDate('date', today())->count(),
+            'total_agendas_today' => Agenda::query()->where('date', date('Y-m-d'))->count(),
             'attendance_rate' => $this->getAttendanceRate(),
         ];
 
@@ -58,7 +58,7 @@ class DashboardController extends Controller
             });
 
         // Presensi hari ini
-        $today_attendance = Attendance::query()->whereDate('date', today())
+        $today_attendance = Attendance::query()->where('date', date('Y-m-d'))
             ->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->get();

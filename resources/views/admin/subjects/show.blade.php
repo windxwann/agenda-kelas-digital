@@ -100,14 +100,13 @@
                 
                 <div class="overflow-x-auto">
                     @php
-                        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
                         $dayNames = [
                             'Monday' => 'Senin',
-                            'Tuesday' => 'Selasa', 
+                            'Tuesday' => 'Selasa',
                             'Wednesday' => 'Rabu',
                             'Thursday' => 'Kamis',
-                            'Friday' => "Jum'at",
-                            'Saturday' => 'Sabtu'
+                            'Friday' => 'Jumat'
                         ];
                     @endphp
                     

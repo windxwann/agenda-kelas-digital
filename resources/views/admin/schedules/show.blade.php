@@ -50,7 +50,7 @@
                             @php
                                 $dayNames = [
                                     'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
-                                    'Thursday' => 'Kamis', 'Friday' => "Jum'at", 'Saturday' => 'Sabtu'
+                                    'Thursday' => 'Kamis', 'Friday' => "Jum'at"
                                 ];
                             @endphp
                             <span class="px-2.5 py-1 text-xs font-bold bg-blue-50 text-blue-700 rounded-lg border border-blue-100">

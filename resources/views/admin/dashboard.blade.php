@@ -159,17 +159,43 @@
         
         <!-- Monthly Trends -->
         <div class="bg-white rounded-3xl shadow-sm p-6 border border-gray-100 flex flex-col">
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-4">
                 <div>
                     <h3 class="text-lg font-bold text-gray-900">Aktivitas Agenda</h3>
                     <p class="text-xs text-gray-500">Tren pengisian agenda bulanan</p>
                 </div>
-                <div class="flex items-center bg-gray-50 rounded-xl p-1">
-                    <div class="px-3 py-1 text-[10px] font-bold text-blue-600 bg-white rounded-lg shadow-sm">Agenda</div>
-                    <div class="px-3 py-1 text-[10px] font-bold text-gray-500">Log</div>
+                <div class="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-100">
+                    <div class="px-3 py-1.5 text-[10px] font-bold text-indigo-600 bg-white rounded-lg shadow-sm flex items-center">
+                        <span class="w-1.5 h-1.5 bg-indigo-500 rounded-full mr-1.5 animate-pulse"></span>
+                        Batang
+                    </div>
+                    <div class="px-3 py-1.5 text-[10px] font-bold text-gray-400">Live</div>
                 </div>
             </div>
-            <div class="flex-1 min-h-[300px]">
+
+            <!-- Mini Metrics Grid inside Chart Card for Executive Premium View -->
+            <div class="grid grid-cols-2 gap-4 mb-5">
+                <div class="bg-indigo-50/40 rounded-2xl p-3 border border-indigo-100/50 flex items-center transition-all hover:bg-indigo-50">
+                    <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"></path></svg>
+                    </div>
+                    <div>
+                        <span class="text-[9px] font-bold text-indigo-500 block uppercase tracking-wider">Total Agenda</span>
+                        <span class="text-sm font-black text-indigo-950" id="agenda-total-metric">-</span>
+                    </div>
+                </div>
+                <div class="bg-violet-50/40 rounded-2xl p-3 border border-violet-100/50 flex items-center transition-all hover:bg-violet-50">
+                    <div class="w-8 h-8 bg-violet-100 text-violet-600 rounded-xl flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    </div>
+                    <div>
+                        <span class="text-[9px] font-bold text-violet-500 block uppercase tracking-wider">Rata-Rata Bulanan</span>
+                        <span class="text-sm font-black text-violet-950" id="agenda-avg-metric">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 min-h-[260px] relative">
                 <canvas id="agendaChart"></canvas>
             </div>
         </div>
@@ -186,43 +212,45 @@
                 </div>
                 <div class="text-right">
                     <span id="stat-attendance-rate" class="text-2xl font-black text-blue-600">{{ $stats['attendance_rate'] ?? 0 }}%</span>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Kehadiran</p>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Kehadiran Bulan Ini</p>
                 </div>
             </div>
             
-            @if(isset($today_attendance) && $today_attendance->count() > 0)
-                <div class="grid grid-cols-2 gap-4">
-                    @foreach($today_attendance as $attendance)
-                        @php
-                            $styles = [
-                                'present' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'bar' => 'bg-emerald-500', 'label' => 'Hadir'],
-                                'absent' => ['bg' => 'bg-rose-50', 'text' => 'text-rose-700', 'bar' => 'bg-rose-500', 'label' => 'Alpha'],
-                                'late' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-700', 'bar' => 'bg-amber-500', 'label' => 'Terlambat'],
-                                'excused' => ['bg' => 'bg-sky-50', 'text' => 'text-sky-700', 'bar' => 'bg-sky-500', 'label' => 'Izin']
-                            ];
-                            $style = $styles[$attendance->status] ?? $styles['present'];
-                            $totalToday = $today_attendance->sum('total');
-                            $percentage = $totalToday > 0 ? ($attendance->total / $totalToday) * 100 : 0;
-                        @endphp
-                        <div class="{{ $style['bg'] }} p-4 rounded-2xl border border-transparent hover:shadow-md transition-all">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold {{ $style['text'] }} uppercase tracking-wider">{{ $style['label'] }}</span>
-                                <span class="text-sm font-black text-gray-900">{{ $attendance->total }}</span>
+            <div id="today-attendance-container">
+                @if(isset($today_attendance) && $today_attendance->count() > 0)
+                    <div class="grid grid-cols-2 gap-4">
+                        @foreach($today_attendance as $attendance)
+                            @php
+                                $styles = [
+                                    'present' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'bar' => 'bg-emerald-500', 'label' => 'Hadir'],
+                                    'absent' => ['bg' => 'bg-rose-50', 'text' => 'text-rose-700', 'bar' => 'bg-rose-500', 'label' => 'Alpha'],
+                                    'late' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-700', 'bar' => 'bg-amber-500', 'label' => 'Terlambat'],
+                                    'excused' => ['bg' => 'bg-sky-50', 'text' => 'text-sky-700', 'bar' => 'bg-sky-500', 'label' => 'Izin']
+                                ];
+                                $style = $styles[$attendance->status] ?? $styles['present'];
+                                $totalToday = $today_attendance->sum('total');
+                                $percentage = $totalToday > 0 ? ($attendance->total / $totalToday) * 100 : 0;
+                            @endphp
+                            <div class="{{ $style['bg'] }} p-4 rounded-2xl border border-transparent hover:shadow-md transition-all">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold {{ $style['text'] }} uppercase tracking-wider">{{ $style['label'] }}</span>
+                                    <span class="text-sm font-black text-gray-900">{{ $attendance->total }}</span>
+                                </div>
+                                <div class="w-full bg-white/50 rounded-full h-1.5 overflow-hidden">
+                                    <div class="{{ $style['bar'] }} h-full rounded-full" style="width: {{ $percentage }}%"></div>
+                                </div>
                             </div>
-                            <div class="w-full bg-white/50 rounded-full h-1.5 overflow-hidden">
-                                <div class="{{ $style['bar'] }} h-full rounded-full" style="width: {{ $percentage }}%"></div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                    </svg>
-                    <p class="text-gray-500 text-sm font-medium">Belum ada data presensi hari ini</p>
-                </div>
-            @endif
+                        @endforeach
+                    </div>
+                @else
+                    <div class="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                        <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <p class="text-gray-500 text-sm font-medium">Belum ada data presensi hari ini</p>
+                    </div>
+                @endif
+            </div>
         </div>
         
         <!-- Recent Activities -->
@@ -301,11 +329,33 @@
         const agendaCanvas = document.getElementById('agendaChart');
         let agendaChart;
         
+        // Fungsi helper untuk meng-update metrik teks total dan rata-rata
+        function updateAgendaMetrics(agendaData) {
+            if (agendaData && agendaData.length > 0) {
+                const total = agendaData.reduce((sum, item) => sum + parseInt(item.total), 0);
+                const avg = Math.round(total / agendaData.length);
+                
+                const totalMetric = document.getElementById('agenda-total-metric');
+                const avgMetric = document.getElementById('agenda-avg-metric');
+                if (totalMetric) totalMetric.innerText = total + ' Agenda';
+                if (avgMetric) avgMetric.innerText = avg + ' / Bulan';
+            } else {
+                const totalMetric = document.getElementById('agenda-total-metric');
+                const avgMetric = document.getElementById('agenda-avg-metric');
+                if (totalMetric) totalMetric.innerText = '0';
+                if (avgMetric) avgMetric.innerText = '0';
+            }
+        }
+
         // Initialize Chart
         if (agendaCanvas && @json($monthly_agendas ?? []).length > 0) {
             const agendaData = @json($monthly_agendas ?? []);
+            
+            // Hitung metrik awal
+            updateAgendaMetrics(agendaData);
+
             agendaChart = new Chart(agendaCanvas.getContext('2d'), {
-                type: 'line',
+                type: 'bar',
                 data: {
                     labels: agendaData.map(item => {
                         const [year, month] = item.month.split('-');
@@ -315,36 +365,49 @@
                     datasets: [{
                         label: 'Jumlah Agenda',
                         data: agendaData.map(item => item.total),
-                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                        borderColor: 'rgba(79, 70, 229, 1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: 'rgba(79, 70, 229, 1)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        backgroundColor: 'rgba(79, 70, 229, 0.85)',
+                        hoverBackgroundColor: 'rgba(79, 70, 229, 1)',
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        barThickness: 24,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'top' },
+                        legend: { display: false },
                         tooltip: {
+                            backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                            titleFont: { size: 11, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            padding: 10,
+                            cornerRadius: 8,
                             callbacks: {
                                 label: function(context) {
-                                    return `Jumlah: ${context.raw} agenda`;
+                                    return ` ${context.raw} Agenda`;
                                 }
                             }
                         }
                     },
                     scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                font: { size: 10, weight: '600' },
+                                color: '#6b7280'
+                            }
+                        },
                         y: {
                             beginAtZero: true,
-                            grid: { drawBorder: false },
-                            ticks: { stepSize: 1 }
+                            grid: {
+                                color: '#f3f4f6',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { size: 10, weight: '600' },
+                                color: '#6b7280'
+                            }
                         }
                     }
                 }
@@ -365,41 +428,111 @@
                     document.getElementById('stat-total-teachers').innerText = data.stats.total_teachers;
                     document.getElementById('stat-total-subjects').innerText = data.stats.total_subjects;
                     document.getElementById('stat-attendance-rate').innerText = data.stats.attendance_rate + '%';
+
+                    // Update Today's Attendance Cards dynamically (Real-time)
+                    const attendanceContainer = document.getElementById('today-attendance-container');
+                    if (attendanceContainer) {
+                        if (data.today_attendance && data.today_attendance.length > 0) {
+                            const totalToday = data.today_attendance.reduce((sum, item) => sum + parseInt(item.total), 0);
+                            
+                            const styles = {
+                                'present': { bg: 'bg-emerald-50', text: 'text-emerald-700', bar: 'bg-emerald-500', label: 'Hadir' },
+                                'absent': { bg: 'bg-rose-50', text: 'text-rose-700', bar: 'bg-rose-500', label: 'Alpha' },
+                                'late': { bg: 'bg-amber-50', text: 'text-amber-700', bar: 'bg-amber-500', label: 'Terlambat' },
+                                'excused': { bg: 'bg-sky-50', text: 'text-sky-700', bar: 'bg-sky-500', label: 'Izin' }
+                            };
+
+                            let cardsHtml = '<div class="grid grid-cols-2 gap-4">';
+                            data.today_attendance.forEach(attendance => {
+                                const style = styles[attendance.status] || styles['present'];
+                                const percentage = totalToday > 0 ? (attendance.total / totalToday) * 100 : 0;
+                                
+                                cardsHtml += `
+                                    <div class="${style.bg} p-4 rounded-2xl border border-transparent hover:shadow-md transition-all">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-xs font-bold ${style.text} uppercase tracking-wider">${style.label}</span>
+                                            <span class="text-sm font-black text-gray-900">${attendance.total}</span>
+                                        </div>
+                                        <div class="w-full bg-white/50 rounded-full h-1.5 overflow-hidden">
+                                            <div class="${style.bar} h-full rounded-full" style="width: ${percentage}%"></div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            cardsHtml += '</div>';
+                            attendanceContainer.innerHTML = cardsHtml;
+                        } else {
+                            attendanceContainer.innerHTML = `
+                                <div class="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                    <p class="text-gray-500 text-sm font-medium">Belum ada data presensi hari ini</p>
+                                </div>
+                            `;
+                        }
+                    }
                     
                     // Update Recent Activities
                     const activitiesList = document.getElementById('recent-activities-list');
                     if (data.recent_activities.length > 0) {
-                        activitiesList.innerHTML = data.recent_activities.map(activity => `
-                            <div class="flex items-start space-x-3 pb-4 border-b border-gray-100 last:border-0">
-                                <div class="w-2 h-2 mt-2 bg-blue-500 rounded-full"></div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-900">${activity.title || 'No Title'}</p>
-                                    <p class="text-xs text-gray-500 mt-1">
-                                        ${activity.class ? activity.class.name : 'Kelas tidak tersedia'} • 
-                                        ${activity.teacher ? activity.teacher.name : 'Guru tidak tersedia'} • 
-                                        ${new Date(activity.date).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}
+                        activitiesList.innerHTML = data.recent_activities.map(activity => {
+                            const timeAgo = activity.created_at ? new Date(activity.created_at) : new Date();
+                            const now = new Date();
+                            const diffInSeconds = Math.floor((now - timeAgo) / 1000);
+                            
+                            let timeText = 'Baru saja';
+                            if (diffInSeconds > 60) {
+                                const diffInMinutes = Math.floor(diffInSeconds / 60);
+                                if (diffInMinutes > 60) {
+                                    const diffInHours = Math.floor(diffInMinutes / 60);
+                                    timeText = `${diffInHours} jam yang lalu`;
+                                } else {
+                                    timeText = `${diffInMinutes} menit yang lalu`;
+                                }
+                            }
+
+                            return `
+                            <div class="flex items-center p-3 rounded-2xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100">
+                                <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm mr-4 flex-shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-bold text-gray-900 truncate">${activity.title || 'No Title'}</p>
+                                    <p class="text-[10px] text-gray-500 mt-0.5 truncate">
+                                        <span class="font-bold text-blue-600">${activity.class ? activity.class.name : 'Kelas N/A'}</span> • 
+                                        ${activity.teacher ? activity.teacher.name : 'Guru N/A'}
                                     </p>
                                 </div>
-                                <span class="text-xs text-gray-400">Baru saja diperbarui</span>
+                                <div class="text-right ml-3">
+                                    <p class="text-[10px] font-bold text-gray-400">${timeText}</p>
+                                </div>
                             </div>
-                        `).join('');
+                        `}).join('');
                     }
                     
-                    // Update Chart if data exists
-                    if (agendaChart && data.monthly_agendas.length > 0) {
-                        agendaChart.data.labels = data.monthly_agendas.map(item => {
-                            const [year, month] = item.month.split('-');
-                            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-                            return monthNames[parseInt(month) - 1] + ' ' + year;
-                        });
-                        agendaChart.data.datasets[0].data = data.monthly_agendas.map(item => item.total);
-                        agendaChart.update();
-                        
-                        // Show chart if it was hidden
-                        if (agendaCanvas.style.display === 'none') {
-                            agendaCanvas.style.display = 'block';
-                            const msg = document.getElementById('no-agenda-msg');
-                            if (msg) msg.remove();
+                    // Update Chart & Metrics if data exists
+                    if (data.monthly_agendas && data.monthly_agendas.length > 0) {
+                        // Update metrik teks
+                        updateAgendaMetrics(data.monthly_agendas);
+
+                        if (agendaChart) {
+                            agendaChart.data.labels = data.monthly_agendas.map(item => {
+                                const [year, month] = item.month.split('-');
+                                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                                return monthNames[parseInt(month) - 1] + ' ' + year;
+                            });
+                            agendaChart.data.datasets[0].data = data.monthly_agendas.map(item => item.total);
+                            agendaChart.update();
+                            
+                            // Show chart if it was hidden
+                            if (agendaCanvas.style.display === 'none') {
+                                agendaCanvas.style.display = 'block';
+                                const msg = document.getElementById('no-agenda-msg');
+                                if (msg) msg.remove();
+                            }
                         }
                     }
                 })

@@ -152,7 +152,7 @@
                                 {{ $agenda->status == 'published' ? 'Dipublikasikan' : 'Draf' }}
                             </span>
                         </div>
-                        <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed mb-3">{{ $agenda->description }}</p>
+                        <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed mb-3">{{ strip_tags($agenda->description) }}</p>
                         <div class="flex items-center space-x-4 text-[10px] font-bold uppercase tracking-wider text-gray-400">
                             <span class="flex items-center">
                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

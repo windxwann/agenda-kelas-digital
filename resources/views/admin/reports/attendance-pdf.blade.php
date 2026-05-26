@@ -59,14 +59,44 @@
 </head>
 <body>
     <div class="header">
-        <h1>LAPORAN PRESENSI SISWA</h1>
+        <h1>{{ isset($is_agenda) && $is_agenda ? 'LAPORAN AGENDA KELAS' : 'LAPORAN PRESENSI SISWA' }}</h1>
         <p>Agenda Kelas Digital</p>
         @if(isset($class))
             <p>Kelas: {{ $class->name }}</p>
         @endif
-        <p>Periode: {{ request('start_date', date('Y-m-01')) }} s/d {{ request('end_date', date('Y-m-t')) }}</p>
+        @if(isset($is_agenda) && $is_agenda)
+            <p>Tanggal: {{ request('date', date('Y-m-d')) }}</p>
+        @else
+            <p>Periode: {{ request('start_date', date('Y-m-01')) }} s/d {{ request('end_date', date('Y-m-t')) }}</p>
+        @endif
     </div>
     
+    @if(isset($is_agenda) && $is_agenda)
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Tanggal</th>
+                <th>Mata Pelajaran</th>
+                <th>Guru</th>
+                <th>Ruangan</th>
+                <th>Judul/Materi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($attendances as $index => $agenda)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ \Carbon\Carbon::parse($agenda->date)->format('d/m/Y') }}</td>
+                <td>{{ $agenda->subject->name ?? 'Umum' }}</td>
+                <td>{{ $agenda->teacher->name ?? '-' }}</td>
+                <td>{{ $agenda->room ?? '-' }}</td>
+                <td>{{ $agenda->title }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @else
     <table>
         <thead>
             <tr>
@@ -101,6 +131,7 @@
             @endforeach
         </tbody>
     </table>
+    @endif
     
     <div class="summary">
         <strong>Ringkasan:</strong>

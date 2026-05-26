@@ -53,19 +53,54 @@
                 </div>
                 
                 <div class="p-6">
-                    <h3 class="text-sm font-bold text-gray-900 mb-4">Informasi Personal</h3>
+                    <h3 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Informasi Personal
+                    </h3>
                     <div class="space-y-4 text-sm">
                         <div class="flex flex-col py-2 border-b border-gray-50">
                             <span class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Kelas</span>
-                            <span class="font-medium text-gray-900">{{ $student->class->name ?? 'Belum ada kelas' }}</span>
+                            <span class="font-medium text-gray-950">{{ $student->class->name ?? 'Belum ada kelas' }}</span>
+                        </div>
+                        <div class="flex flex-col py-2 border-b border-gray-50">
+                            <span class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">NISN</span>
+                            <span class="font-medium text-gray-955 font-mono">{{ $student->nisn ?? '-' }}</span>
                         </div>
                         <div class="flex flex-col py-2 border-b border-gray-50">
                             <span class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Gender</span>
-                            <span class="font-medium text-gray-900">{{ $student->gender == 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
+                            <span class="font-medium text-gray-950">{{ $student->gender == 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
                         </div>
                         <div class="flex flex-col py-2 border-b border-gray-50">
-                            <span class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Alamat</span>
-                            <span class="font-medium text-gray-900">{{ $student->address ?? '-' }}</span>
+                            <span class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Tempat, Tanggal Lahir</span>
+                            <span class="font-medium text-gray-950">
+                                @if($student->tempat_lahir || $student->tanggal_lahir)
+                                    {{ $student->tempat_lahir ?? '-' }}, {{ $student->tanggal_lahir ? \Carbon\Carbon::parse($student->tanggal_lahir)->translatedFormat('d F Y') : '-' }}
+                                @else
+                                    -
+                                @endif
+                            </span>
+                        </div>
+                        <div class="flex flex-col py-2 border-b border-gray-50">
+                            <span class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">No Telepon</span>
+                            <span class="font-medium text-gray-950">{{ $student->phone ?? '-' }}</span>
+                        </div>
+                        <div class="flex flex-col py-2 border-b border-gray-50">
+                            <span class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Email</span>
+                            <span class="font-medium text-gray-950 text-xs">{{ $student->email ?? '-' }}</span>
+                        </div>
+                        <div class="flex flex-col py-2 border-b border-gray-50">
+                            <span class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Alamat Lengkap</span>
+                            <span class="font-medium text-gray-950">
+                                {{ $student->address ?? '-' }}
+                                @if($student->rt || $student->rw || $student->kelurahan || $student->kecamatan)
+                                    <div class="text-xs text-gray-500 mt-1 font-normal leading-relaxed">
+                                        @if($student->rt) RT {{ $student->rt }} @endif
+                                        @if($student->rw) RW {{ $student->rw }} @endif
+                                        @if($student->kelurahan) <br>Kel. {{ $student->kelurahan }} @endif
+                                        @if($student->kecamatan) <br>Kec. {{ $student->kecamatan }} @endif
+                                    </div>
+                                @endif
+                            </span>
                         </div>
                     </div>
                 </div>

@@ -44,7 +44,6 @@
                     <option value="Wednesday" {{ request('day') == 'Wednesday' ? 'selected' : '' }}>Rabu</option>
                     <option value="Thursday" {{ request('day') == 'Thursday' ? 'selected' : '' }}>Kamis</option>
                     <option value="Friday" {{ request('day') == 'Friday' ? 'selected' : '' }}>Jumat</option>
-                    <option value="Saturday" {{ request('day') == 'Saturday' ? 'selected' : '' }}>Sabtu</option>
                 </select>
             </div>
             @if(request('class_id') || request('day'))
@@ -128,7 +127,7 @@
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-100">
                                         @php
-                                            $dayOrderMap = ['Monday' => 1, 'Tuesday' => 2, 'Wednesday' => 3, 'Thursday' => 4, 'Friday' => 5, 'Saturday' => 6, 'Sunday' => 7];
+                                            $dayOrderMap = ['Monday' => 1, 'Tuesday' => 2, 'Wednesday' => 3, 'Thursday' => 4, 'Friday' => 5];
                                             $sortedClassSchedules = $classSchedules->sortBy(function($sch) use ($dayOrderMap) {
                                                 return ($dayOrderMap[$sch->day] ?? 99) . '-' . $sch->start_time;
                                             });
@@ -137,14 +136,13 @@
                                         <tr class="hover:bg-blue-50/40 transition-colors group">
                                             <td class="px-6 py-5 whitespace-nowrap align-middle">
                                                 @php
-                                                    $dayNames = ['Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => "Jum'at", 'Saturday' => 'Sabtu'];
+                                                    $dayNames = ['Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => "Jum'at"];
                                                     $dayColors = [
                                                         'Monday' => 'bg-red-50 text-red-700 border-red-200',
                                                         'Tuesday' => 'bg-orange-50 text-orange-700 border-orange-200',
                                                         'Wednesday' => 'bg-amber-50 text-amber-700 border-amber-200',
                                                         'Thursday' => 'bg-green-50 text-green-700 border-green-200',
                                                         'Friday' => 'bg-blue-50 text-blue-700 border-blue-200',
-                                                        'Saturday' => 'bg-purple-50 text-purple-700 border-purple-200',
                                                     ];
                                                 @endphp
                                                 <span class="px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider border rounded-lg shadow-sm {{ $dayColors[$schedule->day] ?? 'bg-gray-50 text-gray-700 border-gray-200' }}">

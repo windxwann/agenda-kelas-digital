@@ -13,7 +13,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'nis', 'nip', 'phone', 'address', 'avatar', 'class_id', 'status', 'gender'
+        'name', 'email', 'password', 'role', 'nis', 'nip', 'phone', 'address', 'avatar', 'class_id', 'status', 'gender',
+        'nisn', 'tempat_lahir', 'tanggal_lahir', 'rt', 'rw', 'kelurahan', 'kecamatan'
     ];
 
     protected $hidden = [
@@ -52,5 +53,10 @@ class User extends Authenticatable
     public function classHomeroom()
     {
         return $this->hasMany(Classes::class, 'homeroom_teacher_id');
+    }
+
+    public function teachingSchedules()
+    {
+        return $this->hasMany(Schedule::class, 'teacher_id');
     }
 }

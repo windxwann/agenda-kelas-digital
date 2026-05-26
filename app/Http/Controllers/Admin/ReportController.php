@@ -45,16 +45,16 @@ class ReportController extends Controller
             $query->where('status', $request->status);
         }
         
-        $attendances = $query->latest('date')->paginate(20);
-        
-        // Summary statistics
+        // Summary statistics (calculated before paginate() to prevent offset/limit from zeroing out counts)
         $summary = [
-            'total' => $query->count(),
+            'total' => (clone $query)->count(),
             'present' => (clone $query)->where('status', 'present')->count(),
             'absent' => (clone $query)->where('status', 'absent')->count(),
             'late' => (clone $query)->where('status', 'late')->count(),
             'excused' => (clone $query)->where('status', 'excused')->count(),
         ];
+        
+        $attendances = $query->latest('date')->paginate(20);
         
         return view('admin.reports.attendance', compact('attendances', 'classes', 'summary'));
     }

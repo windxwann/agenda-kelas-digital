@@ -13,7 +13,7 @@ class Classes extends Model
     protected $table = 'classes';
     
     protected $fillable = [
-        'name', 'grade_level', 'academic_year', 
+        'name', 'grade_level', 'academic_year',
         'homeroom_teacher_id', 'capacity', 'description', 'is_active'
     ];
     
@@ -24,7 +24,7 @@ class Classes extends Model
     
     public function students()
     {
-        return $this->hasMany(User::class, 'class_id');
+        return $this->hasMany(User::class, 'class_id')->orderByRaw('LOWER(name) ASC');
     }
     
     public function schedules()

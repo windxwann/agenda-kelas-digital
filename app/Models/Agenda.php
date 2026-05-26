@@ -13,6 +13,7 @@ class Agenda extends Model
         'class_id',
         'teacher_id',
         'subject_id',
+        'room',
         'date',
         'title',
         'description',

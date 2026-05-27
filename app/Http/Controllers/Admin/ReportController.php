@@ -52,6 +52,7 @@ class ReportController extends Controller
             'absent' => (clone $query)->where('status', 'absent')->count(),
             'late' => (clone $query)->where('status', 'late')->count(),
             'excused' => (clone $query)->where('status', 'excused')->count(),
+            'sick' => (clone $query)->where('status', 'sick')->count(),
         ];
         
         $attendances = $query->latest('date')->paginate(20);
@@ -92,12 +93,50 @@ class ReportController extends Controller
      */
     public function exportExcel(Request $request)
     {
-        $filters = [
-            'class_id' => $request->class_id,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
+        $classId = $request->class_id;
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        $studentsQuery = User::role('siswa');
+        if ($classId) {
+            $studentsQuery->where('class_id', $classId);
+        }
+
+        $students = $studentsQuery->with(['attendances' => function($q) use ($startDate, $endDate) {
+                if ($startDate) $q->whereDate('date', '>=', $startDate);
+                if ($endDate) $q->whereDate('date', '<=', $endDate);
+            }])
+            ->orderBy('name', 'asc')
+            ->get();
+
+        $reportData = [];
+        foreach ($students as $student) {
+            $att = $student->attendances;
+            $present = $att->where('status', 'present')->count();
+            $absent = $att->where('status', 'absent')->count();
+            $late = $att->where('status', 'late')->count();
+            $excused = $att->where('status', 'excused')->count();
+            $sick = $att->where('status', 'sick')->count();
+            $total = $att->count();
+            
+            $reportData[] = (object)[
+                'nis' => $student->nis,
+                'name' => $student->name,
+                'present' => $present,
+                'absent' => $absent,
+                'late' => $late,
+                'excused' => $excused,
+                'sick' => $sick,
+                'total' => $total,
+                'percentage' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+            ];
+        }
+
+        $data = [
+            'students' => $reportData,
         ];
         
-        return Excel::download(new AttendanceReportExport($filters), 'laporan-presensi-' . date('Y-m-d') . '.xlsx');
+        $filename = 'laporan-presensi-' . ($classId ? Classes::find($classId)->name . '-' : '') . date('Y-m-d') . '.xlsx';
+        return Excel::download(new AttendanceReportExport($data), $filename);
     }
 }

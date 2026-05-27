@@ -25,7 +25,7 @@ class AttendanceController extends Controller
         $students = User::role('siswa')
             ->where('class_id', $class->id)
             ->with(['attendances' => function($q) use ($date) {
-                $q->where('date', $date);
+                $q->whereDate('date', $date);
             }])
             ->orderByRaw('LOWER(name) ASC')
             ->get();

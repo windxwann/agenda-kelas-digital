@@ -84,7 +84,7 @@
                                         $statusStyles = [
                                             'present' => 'bg-emerald-50 text-emerald-600 border-emerald-100',
                                             'excused' => 'bg-blue-50 text-blue-600 border-blue-100',
-                                            'sick' => 'bg-blue-50 text-blue-600 border-blue-100',
+                                            'sick' => 'bg-orange-50 text-orange-600 border-orange-100',
                                             'late' => 'bg-amber-50 text-amber-600 border-amber-100',
                                             'absent' => 'bg-rose-50 text-rose-600 border-rose-100',
                                         ];

@@ -231,67 +231,119 @@
         
         var options = {
             series: [{
-                name: 'Hadir',
-                data: monthlyData.map(item => item.present),
-                color: '#10B981' // emerald-500
+                name: 'Persentase Kehadiran',
+                type: 'area',
+                data: monthlyData.map(item => item.percentage)
             }, {
-                name: 'Izin / Sakit',
-                data: monthlyData.map(item => item.excused),
-                color: '#3B82F6' // blue-500
+                name: 'Sakit',
+                type: 'column',
+                data: monthlyData.map(item => item.sick)
+            }, {
+                name: 'Izin',
+                type: 'column',
+                data: monthlyData.map(item => item.excused)
             }, {
                 name: 'Alpha',
-                data: monthlyData.map(item => item.absent),
-                color: '#EF4444' // red-500
+                type: 'column',
+                data: monthlyData.map(item => item.absent)
             }],
             chart: {
-                type: 'bar',
-                height: 320,
-                stacked: true,
+                height: 350,
+                type: 'line',
+                stacked: false,
                 toolbar: { show: false },
                 zoom: { enabled: false },
                 fontFamily: 'Inter, sans-serif'
             },
+            stroke: {
+                width: [4, 0, 0],
+                curve: 'smooth',
+                dashArray: [0, 0, 0]
+            },
             plotOptions: {
                 bar: {
-                    horizontal: false,
-                    borderRadius: 6,
-                    columnWidth: '35%',
-                },
-            },
-            dataLabels: { enabled: false },
-            stroke: { width: 3, colors: ['#ffffff'] },
-            xaxis: {
-                categories: monthlyData.map(item => item.month),
-                axisBorder: { show: false },
-                axisTicks: { show: false },
-                labels: { style: { colors: '#94a3b8', fontWeight: 600, fontSize: '13px' } }
-            },
-            yaxis: {
-                labels: {
-                    style: { colors: '#94a3b8', fontWeight: 600 },
-                    formatter: (value) => { return Math.round(value) }
+                    columnWidth: '20%',
+                    borderRadius: 4
                 }
             },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    inverseColors: false,
+                    shade: 'light',
+                    type: "vertical",
+                    opacityFrom: [0.4, 1, 1, 1],
+                    opacityTo: [0.1, 1, 1, 1],
+                    stops: [0, 90, 100]
+                }
+            },
+            colors: ['#6366f1', '#f97316', '#3b82f6', '#ef4444'],
+            labels: monthlyData.map(item => item.month),
+            markers: {
+                size: [5, 0, 0, 0],
+                colors: ['#ffffff'],
+                strokeColors: '#6366f1',
+                strokeWidth: 3,
+                hover: { size: 7 }
+            },
+            xaxis: {
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                labels: { style: { colors: '#94a3b8', fontWeight: 600 } }
+            },
+            yaxis: [
+                {
+                    title: {
+                        text: "Persentase (%)",
+                        style: { color: '#6366f1', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }
+                    },
+                    labels: {
+                        style: { colors: '#6366f1', fontWeight: 600 },
+                        formatter: (value) => { return Math.round(value) + '%' }
+                    },
+                    min: 0,
+                    max: 100,
+                    tickAmount: 5
+                },
+                {
+                    opposite: true,
+                    title: {
+                        text: "Jumlah Siswa",
+                        style: { color: '#475569', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }
+                    },
+                    labels: {
+                        style: { colors: '#475569', fontWeight: 600 },
+                        formatter: (value) => { return Math.round(value) }
+                    }
+                }
+            ],
             grid: {
                 borderColor: '#f1f5f9',
                 strokeDashArray: 4,
-                yaxis: { lines: { show: true } },
-                padding: { top: 0, right: 0, bottom: 0, left: 10 }
+                padding: { top: 0, right: 20, bottom: 0, left: 20 }
             },
             legend: {
                 position: 'top',
-                horizontalAlign: 'right',
-                markers: { radius: 12 },
-                itemMargin: { horizontal: 15, vertical: 5 },
-                fontSize: '14px',
+                horizontalAlign: 'left',
+                offsetY: -10,
+                markers: { radius: 12, width: 10, height: 10 },
+                itemMargin: { horizontal: 15, vertical: 0 },
+                fontSize: '13px',
                 fontWeight: 600,
                 labels: { colors: '#475569' }
             },
-            fill: { opacity: 1 },
             tooltip: {
+                shared: true,
+                intersect: false,
                 theme: 'light',
-                y: { formatter: function (val) { return val + " Siswa" } },
-                style: { fontSize: '13px', fontFamily: 'Inter, sans-serif' }
+                y: {
+                    formatter: function (y, { seriesIndex }) {
+                        if (typeof y !== "undefined") {
+                            return seriesIndex === 0 ? y.toFixed(1) + "%" : y.toFixed(0) + " Siswa";
+                        }
+                        return y;
+                    }
+                }
             }
         };
 

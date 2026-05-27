@@ -58,6 +58,7 @@
                     <option value="">Semua Status</option>
                     <option value="present" {{ request('status') == 'present' ? 'selected' : '' }}>Hadir</option>
                     <option value="absent" {{ request('status') == 'absent' ? 'selected' : '' }}>Alpha</option>
+                    <option value="sick" {{ request('status') == 'sick' ? 'selected' : '' }}>Sakit</option>
                     <option value="late" {{ request('status') == 'late' ? 'selected' : '' }}>Terlambat</option>
                     <option value="excused" {{ request('status') == 'excused' ? 'selected' : '' }}>Izin</option>
                 </select>
@@ -72,7 +73,7 @@
     </div>
     
     <!-- Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 group">
             <div class="flex items-center justify-between">
                 <div>
@@ -81,6 +82,18 @@
                 </div>
                 <div class="w-12 h-12 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 group hover:border-orange-500 transition-colors">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Sakit</p>
+                    <p class="text-3xl font-black text-orange-600 mt-1">{{ $summary['sick'] }}</p>
+                </div>
+                <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 </div>
             </div>
         </div>
@@ -175,10 +188,11 @@
                                 $statusStyles = [
                                     'present' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
                                     'absent' => 'bg-rose-50 text-rose-700 border-rose-100',
+                                    'sick' => 'bg-orange-50 text-orange-700 border-orange-100',
                                     'late' => 'bg-amber-50 text-amber-700 border-amber-100',
                                     'excused' => 'bg-sky-50 text-sky-700 border-sky-100'
                                 ];
-                                $statusLabels = ['present' => 'Hadir', 'absent' => 'Alpha', 'late' => 'Terlambat', 'excused' => 'Izin'];
+                                $statusLabels = ['present' => 'Hadir', 'absent' => 'Alpha', 'sick' => 'Sakit', 'late' => 'Terlambat', 'excused' => 'Izin'];
                                 $style = $statusStyles[$attendance->status] ?? 'bg-gray-50 text-gray-700 border-gray-100';
                             @endphp
                             <span class="px-3 py-1 text-[10px] font-black {{ $style }} rounded-lg border uppercase tracking-widest">

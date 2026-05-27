@@ -1,16 +1,23 @@
 {{-- resources/views/sekretaris/attendance/index.blade.php --}}
 @extends('layouts.sekretaris')
 
-@section('title', 'Input Presensi')
+@section('title', 'Presensi Siswa')
 @section('header', 'Presensi Siswa')
 
 @section('content')
-<div class="space-y-8 pb-12">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-            <h1 class="text-3xl font-black text-gray-900 tracking-tight">Presensi Siswa</h1>
-            <p class="text-gray-500 mt-1 font-medium text-sm">Input data kehadiran siswa harian berdasarkan kelas dan tanggal.</p>
+@php
+    $isSubmitted = isset($students) && $students->contains(function($s) {
+        return $s->attendances->count() > 0;
+    });
+@endphp
+<div class="space-y-8 pb-8" x-data="attendanceManager()">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-6">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Presensi Siswa</h1>
+            <p class="mt-2 text-base text-gray-500 max-w-2xl leading-relaxed">
+                Kelola kehadiran siswa kelas <strong>{{ $classes->first()->name }}</strong> secara harian.
+            </p>
         </div>
         <div class="flex items-center space-x-2 bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-sm">
             <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
@@ -18,133 +25,244 @@
         </div>
     </div>
 
-    <!-- Selection Form -->
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-        <form method="GET" action="{{ route('sekretaris.attendance.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
-            <div class="space-y-2">
-                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Kelas Anda</label>
-                <div class="px-6 py-4 bg-gray-100 rounded-2xl text-sm font-bold text-gray-500 border border-transparent">
+    <!-- Selection Section -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group">
+        <form method="GET" action="{{ route('sekretaris.attendance.index') }}" class="relative z-10 flex flex-col md:flex-row items-end gap-4">
+            <div class="w-full md:w-48 space-y-2">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Kelas Anda</label>
+                <div class="px-4 py-3.5 bg-gray-100 border border-gray-100/50 rounded-xl text-sm font-bold text-gray-500 shadow-sm">
                     {{ $classes->first()->name }}
                 </div>
-                <input type="hidden" name="class_id" value="{{ $selectedClassId }}">
             </div>
-            <div class="space-y-2">
-                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Tanggal Presensi <span class="text-rose-500">*</span></label>
-                <input type="date" name="date" value="{{ $date }}" required onchange="this.form.submit()"
-                       class="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm font-bold">
+            
+            <div class="flex-1 space-y-2 w-full">
+                <label for="date" class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Pilih Tanggal Presensi</label>
+                <input type="date" name="date" id="date" value="{{ $date }}" onchange="this.form.submit()" 
+                        class="appearance-none block w-full px-4 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-bold text-gray-900 shadow-sm border border-gray-100/50">
             </div>
-            <div>
-                <button type="submit" class="w-full px-10 py-4 text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl font-bold text-sm hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/20">
-                    Muat Daftar Siswa
+            
+            <div class="w-full md:w-auto">
+                <button type="submit" class="inline-flex items-center justify-center w-full px-8 py-3.5 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 uppercase tracking-widest">
+                    Muat Data
                 </button>
             </div>
         </form>
     </div>
 
-    @if($selectedClassId && count($students) > 0)
-    <!-- Attendance Table -->
-    <form action="{{ route('sekretaris.attendance.store') }}" method="POST">
-        @csrf
-        <input type="hidden" name="class_id" value="{{ $selectedClassId }}">
-        <input type="hidden" name="date" value="{{ $date }}">
-
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-                <h3 class="text-lg font-bold text-gray-900">Daftar Siswa - {{ $classes->find($selectedClassId)->name }}</h3>
-                <div class="flex items-center space-x-4">
-                     <span class="px-4 py-1.5 bg-white text-[10px] font-bold text-gray-400 uppercase tracking-widest rounded-xl border border-gray-100">{{ count($students) }} Siswa</span>
-                </div>
-            </div>
+    @if($selectedClassId)
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden relative">
             
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-100">
-                    <thead>
-                        <tr class="bg-gray-50/30">
-                            <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Siswa</th>
-                            <th class="px-8 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hadir</th>
-                            <th class="px-8 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Izin</th>
-                            <th class="px-8 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alpha</th>
-                            <th class="px-8 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Terlambat</th>
-                            <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Keterangan / Note</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-50">
-                        @foreach($students as $student)
-                        @php 
-                            $existing = $student->attendances->first();
-                            $status = $existing ? $existing->status : 'present';
-                        @endphp
-                        <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="px-8 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white text-xs font-black shadow-sm mr-4">
-                                        {{ strtoupper(substr($student->name, 0, 1)) }}
-                                    </div>
-                                    <div>
-                                        <div class="text-sm font-bold text-gray-900">{{ $student->name }}</div>
-                                        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">NIS: {{ $student->nis }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-8 py-4 text-center">
-                                <input type="radio" name="attendance[{{ $student->id }}][status]" value="present" 
-                                       {{ $status == 'present' ? 'checked' : '' }}
-                                       class="w-5 h-5 text-emerald-500 border-gray-300 focus:ring-emerald-500/20">
-                            </td>
-                            <td class="px-8 py-4 text-center">
-                                <input type="radio" name="attendance[{{ $student->id }}][status]" value="excused" 
-                                       {{ $status == 'excused' ? 'checked' : '' }}
-                                       class="w-5 h-5 text-blue-500 border-gray-300 focus:ring-blue-500/20">
-                            </td>
-                            <td class="px-8 py-4 text-center">
-                                <input type="radio" name="attendance[{{ $student->id }}][status]" value="absent" 
-                                       {{ $status == 'absent' ? 'checked' : '' }}
-                                       class="w-5 h-5 text-rose-500 border-gray-300 focus:ring-rose-500/20">
-                            </td>
-                            <td class="px-8 py-4 text-center">
-                                <input type="radio" name="attendance[{{ $student->id }}][status]" value="late" 
-                                       {{ $status == 'late' ? 'checked' : '' }}
-                                       class="w-5 h-5 text-amber-500 border-gray-300 focus:ring-amber-500/20">
-                            </td>
-                            <td class="px-8 py-4">
-                                <input type="text" name="attendance[{{ $student->id }}][note]" 
-                                       value="{{ $existing ? $existing->note : '' }}"
-                                       placeholder="Tambahkan catatan..."
-                                       class="w-full px-4 py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-xs font-medium">
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <!-- Soft Block / Locked Banner -->
+            <template x-if="isLocked">
+                <div x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="-translate-y-full"
+                     x-transition:enter-end="translate-y-0"
+                     class="bg-blue-600 px-8 py-4 flex items-center justify-between sticky top-0 z-20 shadow-lg">
+                    <div class="flex items-center gap-4 text-white">
+                        <div class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-black uppercase tracking-widest">Data Presensi Terkunci</h4>
+                            <p class="text-[11px] font-medium opacity-90">Sistem mengunci input untuk mencegah perubahan tidak sengaja.</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="unlock()" class="px-6 py-2.5 bg-white text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-50 transition-colors shadow-sm whitespace-nowrap ml-4">
+                        Buka Kunci
+                    </button>
+                </div>
+            </template>
+
+            <!-- Real-time Stats Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-px bg-gray-100 border-b border-gray-100">
+                <div class="bg-white px-8 py-6 flex flex-col items-center justify-center group hover:bg-emerald-50 transition-colors">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-emerald-500 transition-colors">Hadir</span>
+                    <span class="text-3xl font-black text-gray-900 mt-1" x-text="stats.present">0</span>
+                </div>
+                <div class="bg-white px-8 py-6 flex flex-col items-center justify-center group hover:bg-orange-50 transition-colors">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-orange-500 transition-colors">Sakit</span>
+                    <span class="text-3xl font-black text-gray-900 mt-1" x-text="stats.sick">0</span>
+                </div>
+                <div class="bg-white px-8 py-6 flex flex-col items-center justify-center group hover:bg-blue-50 transition-colors">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-500 transition-colors">Izin</span>
+                    <span class="text-3xl font-black text-gray-900 mt-1" x-text="stats.excused">0</span>
+                </div>
+                <div class="bg-white px-8 py-6 flex flex-col items-center justify-center group hover:bg-amber-50 transition-colors">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-amber-500 transition-colors">Telat</span>
+                    <span class="text-3xl font-black text-gray-900 mt-1" x-text="stats.late">0</span>
+                </div>
+                <div class="bg-white px-8 py-6 flex flex-col items-center justify-center group hover:bg-rose-50 transition-colors">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-rose-500 transition-colors">Alpha</span>
+                    <span class="text-3xl font-black text-gray-900 mt-1" x-text="stats.absent">0</span>
+                </div>
             </div>
 
-            <div class="px-8 py-8 bg-gray-50/50 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="flex items-center space-x-2 text-gray-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <p class="text-xs font-bold uppercase tracking-widest">Pastikan semua data sudah benar sebelum menyimpan.</p>
+            <!-- Toolbar (Search & Mark All) -->
+            <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="relative flex-1 max-w-md">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="text" x-model="search" placeholder="Cari nama siswa..." 
+                           class="block w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
                 </div>
-                <button type="submit" class="w-full md:w-auto px-12 py-4 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl transition-all duration-200">
-                    Simpan Presensi Kelas
-                </button>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <button type="button" x-show="!isLocked" @click="markAllPresent()" 
+                            class="px-6 py-3 bg-white border border-gray-200 rounded-2xl text-[10px] font-black text-gray-700 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shadow-sm flex items-center gap-2 uppercase tracking-widest">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Tandai Semua Hadir
+                    </button>
+                    <div class="px-5 py-3 bg-blue-50 text-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                        {{ \Carbon\Carbon::parse($date)->isToday() ? 'SESI AKTIF' : 'RIWAYAT' }}
+                    </div>
+                </div>
             </div>
+
+            <form action="{{ route('sekretaris.attendance.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="class_id" value="{{ $selectedClassId }}">
+                <input type="hidden" name="date" value="{{ $date }}">
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-100">
+                        <thead>
+                            <tr class="bg-white">
+                                <th class="px-8 py-5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Identitas Siswa</th>
+                                <th class="px-8 py-5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status Kehadiran</th>
+                                <th class="px-8 py-5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50 bg-white">
+                            @foreach($students as $student)
+                                @php
+                                    $currentAttendance = $student->attendances->first();
+                                @endphp
+                                <tr class="hover:bg-gray-50/50 transition-colors group" 
+                                    x-show="shouldShow('{{ addslashes($student->name) }}')">
+                                    <td class="px-8 py-6 whitespace-nowrap">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 bg-gray-50 text-gray-400 rounded-xl flex items-center justify-center text-xs font-bold border border-gray-100/50 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300">
+                                                {{ strtoupper(substr($student->name, 0, 1)) }}
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ $student->name }}</span>
+                                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">{{ $student->nis }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6 whitespace-nowrap">
+                                        <div class="flex items-center gap-2.5" 
+                                             x-data="{ 
+                                                status: '{{ $currentAttendance->status ?? 'present' }}',
+                                                init() { 
+                                                    this.$watch('status', (val, old) => {
+                                                        $dispatch('update-stats', { newStatus: val, oldStatus: old });
+                                                    });
+                                                    // Initial stats calculation
+                                                    $dispatch('register-student', { status: this.status });
+                                                }
+                                             }" 
+                                             :class="isLocked ? 'opacity-60 pointer-events-none grayscale-[50%]' : ''">
+                                            
+                                            <template x-for="opt in [
+                                                {v: 'present', l: 'Hadir', c: 'bg-emerald-500'},
+                                                {v: 'sick', l: 'Sakit', c: 'bg-orange-500'},
+                                                {v: 'excused', l: 'Izin', c: 'bg-blue-600'},
+                                                {v: 'late', l: 'Telat', c: 'bg-amber-500'},
+                                                {v: 'absent', l: 'Alpha', c: 'bg-rose-500'}
+                                            ]">
+                                                <label class="cursor-pointer">
+                                                    <input type="radio" 
+                                                           name="attendance[{{ $student->id }}][status]" 
+                                                           :value="opt.v" 
+                                                           x-model="status" 
+                                                           class="hidden">
+                                                    <span :class="status === opt.v ? opt.c + ' text-white shadow-lg' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" 
+                                                          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all duration-300"
+                                                          x-text="opt.l"></span>
+                                                </label>
+                                            </template>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6 whitespace-nowrap">
+                                        <input type="text" name="attendance[{{ $student->id }}][note]" value="{{ $currentAttendance->note ?? '' }}" 
+                                               :readonly="isLocked"
+                                               :class="isLocked ? 'bg-gray-100/50 text-gray-400 cursor-not-allowed' : 'bg-gray-50 text-gray-600 focus:bg-white focus:ring-2 focus:ring-blue-500'"
+                                               class="w-full border border-transparent rounded-xl px-4 py-2.5 text-xs font-medium placeholder:text-gray-300 transition-all shadow-sm"
+                                               placeholder="Catatan...">
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="px-8 py-8 bg-gray-50/50 border-t border-gray-100 flex items-center justify-end" x-show="!isLocked" x-cloak>
+                    <button type="submit" class="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-bold shadow-xl shadow-blue-500/20 hover:scale-[1.02] transition-all duration-300 uppercase text-xs tracking-widest">
+                        Simpan Presensi
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
-    @elseif($selectedClassId)
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-20 text-center">
-        <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-        </div>
-        <h3 class="text-xl font-bold text-gray-900">Tidak Ada Siswa</h3>
-        <p class="text-gray-500 mt-2 font-medium">Belum ada siswa yang terdaftar di kelas ini.</p>
-    </div>
     @else
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-20 text-center">
-        <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-12 h-12 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+        <div class="bg-white border border-gray-100 rounded-[2.5rem] p-24 text-center shadow-sm">
+            <div class="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mx-auto mb-8 text-gray-200 border-2 border-dashed border-gray-100">
+                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Kelas Tidak Ditemukan</h3>
+            <p class="text-gray-500 font-medium max-w-sm mx-auto leading-relaxed">Anda belum terdaftar di kelas manapun. Silakan hubungi admin untuk pengaturan kelas.</p>
         </div>
-        <h3 class="text-xl font-bold text-gray-900">Pilih Kelas & Tanggal</h3>
-        <p class="text-gray-500 mt-2 font-medium">Silakan pilih kelas dan tanggal untuk mulai menginput presensi.</p>
-    </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+    function attendanceManager() {
+        return {
+            isLocked: {{ $isSubmitted ? 'true' : 'false' }},
+            search: '',
+            stats: {
+                present: 0,
+                sick: 0,
+                excused: 0,
+                late: 0,
+                absent: 0
+            },
+            
+            init() {
+                this.$on('update-stats', (e) => {
+                    this.stats[e.detail.oldStatus]--;
+                    this.stats[e.detail.newStatus]++;
+                });
+                this.$on('register-student', (e) => {
+                    this.stats[e.detail.status]++;
+                });
+            },
+
+            unlock() {
+                if(confirm('Apakah Anda yakin ingin mengubah presensi yang sudah tersimpan?')) {
+                    this.isLocked = false;
+                }
+            },
+
+            shouldShow(name) {
+                if (!this.search) return true;
+                return name.toLowerCase().includes(this.search.toLowerCase());
+            },
+
+            markAllPresent() {
+                const radios = document.querySelectorAll('input[value="present"]');
+                radios.forEach(radio => {
+                    if (!radio.checked) {
+                        radio.click();
+                    }
+                });
+            }
+        }
+    }
+</script>
+@endpush
 @endsection

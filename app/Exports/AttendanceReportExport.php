@@ -3,71 +3,87 @@
 
 namespace App\Exports;
 
-use App\Models\Attendance;
-use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Illuminate\Support\Collection;
 
-class AttendanceReportExport implements FromQuery, WithHeadings, WithMapping
+class AttendanceReportExport implements FromCollection, WithHeadings, WithStyles, WithColumnWidths, WithTitle
 {
-    protected $filters;
-    
-    public function __construct($filters)
+    protected $data;
+
+    public function __construct($data)
     {
-        $this->filters = $filters;
+        $this->data = $data;
     }
-    
-    public function query()
+
+    public function collection(): Collection
     {
-        $query = Attendance::with(['student', 'student.class']);
-        
-        if (isset($this->filters['class_id']) && $this->filters['class_id']) {
-            $query->whereHas('student', function($q) {
-                $q->where('class_id', $this->filters['class_id']);
-            });
+        $rows = collect();
+        foreach ($this->data['students'] as $i => $student) {
+            $rows->push([
+                $i + 1,
+                $student->nis ?? '-',
+                $student->name,
+                $student->present,
+                $student->sick,
+                $student->absent,
+                $student->late,
+                $student->excused,
+                $student->total,
+                $student->percentage . '%',
+            ]);
         }
-        
-        if (isset($this->filters['start_date']) && $this->filters['start_date']) {
-            $query->whereDate('date', '>=', $this->filters['start_date']);
-        }
-        
-        if (isset($this->filters['end_date']) && $this->filters['end_date']) {
-            $query->whereDate('date', '<=', $this->filters['end_date']);
-        }
-        
-        return $query;
+        return $rows;
     }
-    
+
     public function headings(): array
     {
         return [
-            'Tanggal',
+            'No',
             'NIS',
             'Nama Siswa',
-            'Kelas',
-            'Status',
-            'Jam Masuk',
-            'Keterangan'
+            'Hadir',
+            'Sakit',
+            'Alpha',
+            'Telat',
+            'Izin',
+            'Total',
+            '% Hadir',
         ];
     }
-    
-    public function map($attendance): array
+
+    public function styles(Worksheet $sheet): array
     {
-        $statusMap = [
-            'present' => 'Hadir',
-            'absent' => 'Alpha',
-            'late' => 'Terlambat',
-            'excused' => 'Izin'
-        ];
-        
         return [
-            $attendance->date->format('d/m/Y'),
-            $attendance->student->nis,
-            $attendance->student->name,
-            $attendance->student->class->name ?? '-',
-            $statusMap[$attendance->status] ?? $attendance->status,
-            $attendance->check_in_time ?? '-',
-            $attendance->note ?? '-'
+            1 => [
+                'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
+                'fill' => ['fillType' => 'solid', 'startColor' => ['argb' => 'FF1E40AF']],
+                'alignment' => ['horizontal' => 'center'],
+            ],
         ];
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 5,
+            'B' => 15,
+            'C' => 30,
+            'D' => 10,
+            'E' => 10,
+            'F' => 10,
+            'G' => 10,
+            'H' => 10,
+            'I' => 12,
+        ];
+    }
+
+    public function title(): string
+    {
+        return 'Laporan Presensi';
     }
 }

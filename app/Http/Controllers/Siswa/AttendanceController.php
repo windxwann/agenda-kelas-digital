@@ -21,6 +21,7 @@ class AttendanceController extends Controller
             'present' => Attendance::where('student_id', $user->id)->whereIn('status', ['present', 'late'])->count(),
             'absent' => Attendance::where('student_id', $user->id)->where('status', 'absent')->count(),
             'late' => Attendance::where('student_id', $user->id)->where('status', 'late')->count(),
+            'sick' => Attendance::where('student_id', $user->id)->where('status', 'sick')->count(),
             'excused' => Attendance::where('student_id', $user->id)->where('status', 'excused')->count(),
         ];
 

@@ -46,14 +46,42 @@
     </div>
 
     @if($selectedClassId)
-        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+        @php
+            $isSubmitted = $students->contains(function($s) {
+                return $s->attendances->count() > 0;
+            });
+        @endphp
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden" x-data="{ isLocked: {{ $isSubmitted ? 'true' : 'false' }} }">
+            @if($isSubmitted)
+            <div x-show="isLocked" x-cloak class="bg-blue-50 border-b border-blue-100 px-8 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-blue-900">Presensi Terkunci</h4>
+                        <p class="text-xs text-blue-600">Anda sudah menyimpan presensi kelas ini untuk hari ini. Untuk mengubahnya, silakan buka kunci terlebih dahulu.</p>
+                    </div>
+                </div>
+                <button type="button" @click="if(confirm('Apakah Anda yakin ingin mengubah presensi yang sudah tersimpan?')) isLocked = false" class="px-4 py-2 bg-white text-blue-600 rounded-lg text-xs font-bold border border-blue-200 hover:bg-blue-600 hover:text-white transition-colors shadow-sm whitespace-nowrap ml-4">
+                    Buka Kunci
+                </button>
+            </div>
+            @endif
+
+            <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h3 class="text-lg font-bold text-gray-900">Daftar Siswa</h3>
                     <p class="text-xs text-gray-500 font-medium">Silakan tentukan status kehadiran hari ini ({{ now()->translatedFormat('d F Y') }})</p>
                 </div>
-                <div class="px-4 py-1.5 bg-white border border-gray-200 rounded-xl text-[10px] font-black text-blue-600 uppercase tracking-widest shadow-sm">
-                    SESI AKTIF
+                <div class="flex flex-wrap items-center gap-3">
+                    <button type="button" x-show="!isLocked" onclick="document.querySelectorAll('input[value=\'present\']').forEach(r => { r.checked = true; r.dispatchEvent(new Event('change')); });" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2 uppercase tracking-wider">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Tandai Semua Hadir
+                    </button>
+                    <div class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black text-blue-600 uppercase tracking-widest shadow-sm">
+                        SESI AKTIF
+                    </div>
                 </div>
             </div>
 
@@ -88,10 +116,14 @@
                                         </div>
                                     </td>
                                     <td class="px-8 py-6 whitespace-nowrap">
-                                        <div class="flex items-center gap-2.5" x-data="{ status: '{{ $currentAttendance->status ?? 'present' }}' }">
+                                        <div class="flex items-center gap-2.5" x-data="{ status: '{{ $currentAttendance->status ?? 'present' }}' }" :class="isLocked ? 'opacity-60 pointer-events-none grayscale-[50%]' : ''">
                                             <label class="cursor-pointer">
                                                 <input type="radio" name="attendance[{{ $student->id }}][status]" value="present" x-model="status" class="hidden">
                                                 <span :class="status === 'present' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all duration-300">Hadir</span>
+                                            </label>
+                                            <label class="cursor-pointer">
+                                                <input type="radio" name="attendance[{{ $student->id }}][status]" value="sick" x-model="status" class="hidden">
+                                                <span :class="status === 'sick' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all duration-300">Sakit</span>
                                             </label>
                                             <label class="cursor-pointer">
                                                 <input type="radio" name="attendance[{{ $student->id }}][status]" value="excused" x-model="status" class="hidden">
@@ -109,7 +141,9 @@
                                     </td>
                                     <td class="px-8 py-6 whitespace-nowrap">
                                         <input type="text" name="attendance[{{ $student->id }}][note]" value="{{ $currentAttendance->note ?? '' }}" 
-                                               class="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-2.5 text-xs font-medium text-gray-600 placeholder:text-gray-300 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all shadow-sm"
+                                               :readonly="isLocked"
+                                               :class="isLocked ? 'bg-gray-100/50 text-gray-400 cursor-not-allowed' : 'bg-gray-50 text-gray-600 focus:bg-white focus:ring-2 focus:ring-blue-500'"
+                                               class="w-full border border-transparent rounded-xl px-4 py-2.5 text-xs font-medium placeholder:text-gray-300 transition-all shadow-sm"
                                                placeholder="Catatan...">
                                     </td>
                                 </tr>
@@ -118,7 +152,7 @@
                     </table>
                 </div>
 
-                <div class="px-8 py-8 bg-gray-50/50 border-t border-gray-100 flex items-center justify-end">
+                <div class="px-8 py-8 bg-gray-50/50 border-t border-gray-100 flex items-center justify-end" x-show="!isLocked" x-cloak>
                     <button type="submit" class="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-bold shadow-xl shadow-blue-500/20 hover:scale-[1.02] transition-all duration-300 uppercase text-xs tracking-widest">
                         Simpan Presensi
                     </button>

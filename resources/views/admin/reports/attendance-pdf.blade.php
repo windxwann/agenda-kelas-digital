@@ -120,6 +120,7 @@
                         $statusLabels = [
                             'present' => 'Hadir',
                             'absent' => 'Alpha',
+                            'sick' => 'Sakit',
                             'late' => 'Terlambat',
                             'excused' => 'Izin'
                         ];

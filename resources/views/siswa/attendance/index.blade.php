@@ -10,24 +10,28 @@
         'present' => 'bg-green-50 text-green-700 border-green-100',
         'absent'  => 'bg-red-50 text-red-700 border-red-100',
         'late'    => 'bg-yellow-50 text-yellow-700 border-yellow-100',
+        'sick'    => 'bg-orange-50 text-orange-700 border-orange-100',
         'excused' => 'bg-blue-50 text-blue-700 border-blue-100',
     ];
     $statusBadges = [
         'present' => 'bg-green-500',
         'absent'  => 'bg-red-500',
         'late'    => 'bg-yellow-500',
+        'sick'    => 'bg-orange-500',
         'excused' => 'bg-blue-500',
     ];
     $statusIcons = [
         'present' => '✓',
         'absent'  => '✗',
         'late'    => '⏰',
+        'sick'    => '🤒',
         'excused' => '📋',
     ];
     $statusLabels = [
         'present' => 'Hadir',
         'absent'  => 'Alpha',
         'late'    => 'Terlambat',
+        'sick'    => 'Sakit',
         'excused' => 'Izin',
     ];
 @endphp
@@ -44,7 +48,7 @@
     </div>
 
     {{-- Stats Grid --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <div class="flex items-center justify-between mb-3">
                 <div class="p-2 bg-green-50 text-green-600 rounded-xl">
@@ -55,7 +59,46 @@
                 <span class="text-[10px] font-bold text-green-600 uppercase">Hadir</span>
             </div>
             <p class="text-2xl font-bold text-gray-900">{{ $stats['present'] }}</p>
-            <p class="text-xs text-gray-400 mt-1">Total Kehadiran</p>
+            <p class="text-xs text-gray-400 mt-1">Total</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <div class="p-2 bg-orange-50 text-orange-600 rounded-xl">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </div>
+                <span class="text-[10px] font-bold text-orange-600 uppercase">Sakit</span>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">{{ $stats['sick'] }}</p>
+            <p class="text-xs text-gray-400 mt-1">Hari Sakit</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <div class="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <span class="text-[10px] font-bold text-blue-600 uppercase">Izin</span>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">{{ $stats['excused'] }}</p>
+            <p class="text-xs text-gray-400 mt-1">Keperluan Lain</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+                <div class="p-2 bg-yellow-50 text-yellow-600 rounded-xl">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <span class="text-[10px] font-bold text-yellow-600 uppercase">Telat</span>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">{{ $stats['late'] }}</p>
+            <p class="text-xs text-gray-400 mt-1">Terlambat</p>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
@@ -69,32 +112,6 @@
             </div>
             <p class="text-2xl font-bold text-gray-900">{{ $stats['absent'] }}</p>
             <p class="text-xs text-gray-400 mt-1">Ketidakhadiran</p>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <div class="flex items-center justify-between mb-3">
-                <div class="p-2 bg-yellow-50 text-yellow-600 rounded-xl">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <span class="text-[10px] font-bold text-yellow-600 uppercase">Telat</span>
-            </div>
-            <p class="text-2xl font-bold text-gray-900">{{ $stats['late'] }}</p>
-            <p class="text-xs text-gray-400 mt-1">Terlambat Masuk</p>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <div class="flex items-center justify-between mb-3">
-                <div class="p-2 bg-blue-50 text-blue-600 rounded-xl">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
-                <span class="text-[10px] font-bold text-blue-600 uppercase">Izin</span>
-            </div>
-            <p class="text-2xl font-bold text-gray-900">{{ $stats['excused'] }}</p>
-            <p class="text-xs text-gray-400 mt-1">Izin atau Sakit</p>
         </div>
     </div>
 

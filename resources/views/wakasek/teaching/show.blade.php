@@ -55,9 +55,11 @@
                                     <span class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
                                         {{ \Carbon\Carbon::parse($agenda->date)->translatedFormat('l, d M Y') }}
                                     </span>
+                                    @if($agenda->room)
                                     <span class="text-xs text-gray-500 font-medium mt-1">
-                                        Jam ke-{{ $agenda->time_slot }}
+                                        Ruang: {{ $agenda->room }}
                                     </span>
+                                    @endif
                                 </div>
                             </td>
                             <td class="px-8 py-6 align-top">
@@ -74,20 +76,20 @@
                                 <div class="flex flex-col gap-3">
                                     <div>
                                         <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Materi / Kegiatan</div>
-                                        <p class="text-sm text-gray-700 leading-relaxed">{{ $agenda->activity ?? '-' }}</p>
+                                        <p class="text-sm text-gray-700 leading-relaxed font-semibold">{{ $agenda->title ?? '-' }}</p>
                                     </div>
-                                    @if($agenda->notes)
+                                    @if($agenda->description)
                                     <div>
-                                        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Catatan Khusus</div>
-                                        <p class="text-sm text-gray-500 leading-relaxed italic">{{ $agenda->notes }}</p>
+                                        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Deskripsi / Catatan</div>
+                                        <div class="text-sm text-gray-500 leading-relaxed italic prose prose-sm max-w-none">{!! $agenda->description !!}</div>
                                     </div>
                                     @endif
-                                    @if($agenda->assignment)
+                                    @if($agenda->attachments)
                                     <div class="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-600 rounded-lg text-xs font-medium border border-amber-100 self-start">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                                         </svg>
-                                        Tugas Diberikan
+                                        Tugas / Lampiran
                                     </div>
                                     @endif
                                 </div>

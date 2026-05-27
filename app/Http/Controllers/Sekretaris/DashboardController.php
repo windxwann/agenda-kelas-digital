@@ -63,30 +63,41 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
         
-        // Monthly Attendance for Chart
+        // Monthly Attendance for Chart - Optimized
         $monthly_attendance = collect();
+        $startOfRange = \Carbon\Carbon::now()->subMonths(5)->startOfMonth();
+        
+        $attendanceStats = Attendance::whereHas('student', function($q) use ($classId) {
+                $q->where('class_id', $classId);
+            })
+            ->where('date', '>=', $startOfRange)
+            ->select(
+                DB::raw("strftime('%Y-%m', date) as month_key"),
+                DB::raw("status"),
+                DB::raw("count(*) as total")
+            )
+            ->groupBy('month_key', 'status')
+            ->get();
+
         for ($i = 5; $i >= 0; $i--) {
-            $month = \Carbon\Carbon::now()->subMonths($i);
+            $date = \Carbon\Carbon::now()->subMonths($i);
+            $monthKey = $date->format('Y-m');
+            
+            $monthStats = $attendanceStats->where('month_key', $monthKey);
+            
+            $present = $monthStats->whereIn('status', ['present', 'late'])->sum('total');
+            $excused = $monthStats->where('status', 'excused')->sum('total');
+            $absent = $monthStats->where('status', 'absent')->sum('total');
+            $sick = $monthStats->where('status', 'sick')->sum('total');
+            $total = $present + $excused + $absent + $sick;
+            
             $monthly_attendance->push([
-                'month' => $month->translatedFormat('F'),
-                'present' => Attendance::whereHas('student', function($q) use ($classId) {
-                        $q->where('class_id', $classId);
-                    })
-                    ->whereIn('status', ['present', 'late'])
-                    ->whereMonth('date', $month->month)
-                    ->count(),
-                'excused' => Attendance::whereHas('student', function($q) use ($classId) {
-                        $q->where('class_id', $classId);
-                    })
-                    ->where('status', 'excused')
-                    ->whereMonth('date', $month->month)
-                    ->count(),
-                'absent' => Attendance::whereHas('student', function($q) use ($classId) {
-                        $q->where('class_id', $classId);
-                    })
-                    ->where('status', 'absent')
-                    ->whereMonth('date', $month->month)
-                    ->count(),
+                'month' => $date->translatedFormat('F'),
+                'present' => (int)$present,
+                'excused' => (int)$excused,
+                'absent' => (int)$absent,
+                'sick' => (int)$sick,
+                'percentage' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
             ]);
         }
         

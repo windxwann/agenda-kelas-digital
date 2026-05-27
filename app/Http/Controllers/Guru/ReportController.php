@@ -9,7 +9,6 @@ use App\Models\Classes;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AttendanceReportExport;
 
@@ -43,7 +42,6 @@ class ReportController extends Controller
             'class_id' => 'required|exists:classes,id',
             'month' => 'required',
             'year' => 'required',
-            'format' => 'required|in:pdf,excel'
         ]);
 
         $teacher = Auth::user();
@@ -54,11 +52,22 @@ class ReportController extends Controller
         $startDate = "$year-$month-01";
         $endDate = date('Y-m-t', strtotime($startDate));
         
+        // Get subjects taught by this teacher in this class
+        $subjects = \App\Models\Schedule::where('teacher_id', $teacher->id)
+            ->where('class_id', $class->id)
+            ->with('subject')
+            ->get()
+            ->pluck('subject.name')
+            ->unique()
+            ->implode(', ');
+
         $students = User::role('siswa')
             ->where('class_id', $class->id)
             ->with(['attendances' => function($q) use ($startDate, $endDate) {
-                $q->whereBetween('date', [$startDate, $endDate]);
+                $q->whereBetween('date', [$startDate, $endDate])
+                  ->orderBy('date', 'asc');
             }])
+            ->orderBy('name', 'asc')
             ->get();
         
         $reportData = [];
@@ -68,32 +77,34 @@ class ReportController extends Controller
             $absent = $att->where('status', 'absent')->count();
             $late = $att->where('status', 'late')->count();
             $excused = $att->where('status', 'excused')->count();
+            $sick = $att->where('status', 'sick')->count();
             $total = $att->count();
             
             $reportData[] = (object)[
                 'nis' => $student->nis,
                 'name' => $student->name,
                 'present' => $present,
+                'sick' => $sick,
                 'absent' => $absent,
                 'late' => $late,
                 'excused' => $excused,
                 'total' => $total,
-                'percentage' => $total > 0 ? round(($present / $total) * 100, 1) : 0
+                'percentage' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+                'details' => $att->whereIn('status', ['absent', 'late', 'excused', 'sick'])
             ];
         }
         
         $data = [
             'class' => $class,
-            'month' => date('F Y', strtotime($startDate)),
+            'month_name' => date('F Y', strtotime($startDate)),
+            'month' => $month,
+            'year' => $year,
             'students' => $reportData,
-            'teacher' => $teacher
+            'teacher' => $teacher,
+            'subjects' => $subjects ?: 'Semua Mata Pelajaran',
+            'print_date' => now()->translatedFormat('d F Y H:i'),
         ];
         
-        if ($request->input('format') == 'pdf') {
-            $pdf = Pdf::loadView('guru.report.attendance-pdf', $data);
-            return $pdf->download("laporan-presensi-{$class->name}-{$month}-{$year}.pdf");
-        } else {
-            return Excel::download(new AttendanceReportExport($data), "laporan-presensi-{$class->name}-{$month}-{$year}.xlsx");
-        }
+        return Excel::download(new AttendanceReportExport($data), "laporan-presensi-{$class->name}-{$month}-{$year}.xlsx");
     }
 }

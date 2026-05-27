@@ -40,7 +40,7 @@ class AttendanceController extends Controller
         $request->validate([
             'date' => 'required|date',
             'attendance' => 'required|array',
-            'attendance.*.status' => 'required|in:present,absent,late,excused',
+            'attendance.*.status' => 'required|in:present,absent,late,excused,sick',
             'attendance.*.note' => 'nullable|string|max:255',
         ]);
         
@@ -97,6 +97,7 @@ class AttendanceController extends Controller
             'absent' => (clone $query)->where('status', 'absent')->count(),
             'late' => (clone $query)->where('status', 'late')->count(),
             'excused' => (clone $query)->where('status', 'excused')->count(),
+            'sick' => (clone $query)->where('status', 'sick')->count(),
         ];
         
         $attendances = $query->latest('date')->paginate(15);

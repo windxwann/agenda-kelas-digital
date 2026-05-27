@@ -55,41 +55,13 @@
                 </div>
             </div>
 
-            <div class="space-y-4">
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Format Unduhan</label>
-                <div class="grid grid-cols-2 gap-6">
-                    <label class="relative cursor-pointer group">
-                        <input type="radio" name="format" value="pdf" checked class="hidden peer">
-                        <div class="p-6 bg-gray-50 border-2 border-transparent rounded-[2rem] flex flex-col items-center gap-4 transition-all peer-checked:bg-blue-50 peer-checked:border-blue-600 group-hover:bg-gray-100">
-                            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-rose-500 shadow-sm transition-transform group-hover:scale-110">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                                </svg>
-                            </div>
-                            <span class="text-xs font-black text-gray-900 uppercase tracking-widest">Dokumen PDF</span>
-                        </div>
-                    </label>
-
-                    <label class="relative cursor-pointer group">
-                        <input type="radio" name="format" value="excel" class="hidden peer">
-                        <div class="p-6 bg-gray-50 border-2 border-transparent rounded-[2rem] flex flex-col items-center gap-4 transition-all peer-checked:bg-emerald-50 peer-checked:border-emerald-600 group-hover:bg-gray-100">
-                            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm transition-transform group-hover:scale-110">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                            </div>
-                            <span class="text-xs font-black text-gray-900 uppercase tracking-widest">Excel Sheet</span>
-                        </div>
-                    </label>
-                </div>
-            </div>
-
             <div class="pt-6">
-                <button type="submit" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-bold text-sm shadow-xl shadow-blue-500/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-3 tracking-widest uppercase">
+                <input type="hidden" name="format" value="excel">
+                <button type="submit" class="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-bold text-sm shadow-xl shadow-emerald-500/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-3 tracking-widest uppercase">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
-                    Generate Laporan
+                    Generate Laporan Excel
                 </button>
             </div>
         </form>

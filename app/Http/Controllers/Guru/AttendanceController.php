@@ -29,7 +29,7 @@ class AttendanceController extends Controller
             $students = User::role('siswa')
                 ->where('class_id', $selectedClassId)
                 ->with(['attendances' => function($q) {
-                    $q->where('date', date('Y-m-d'));
+                    $q->whereDate('date', date('Y-m-d'));
                 }])
                 ->orderByRaw('LOWER(name) ASC')
                 ->get();
@@ -49,6 +49,7 @@ class AttendanceController extends Controller
         $request->validate([
             'class_id' => 'required|exists:classes,id',
             'attendance' => 'required|array',
+            'attendance.*.status' => 'required|in:present,absent,late,excused,sick',
         ]);
 
         $classId = $request->class_id;

@@ -160,22 +160,18 @@
 
 {{-- Modal Detail Agenda --}}
 <div id="agendaModal" 
-     class="fixed inset-0 z-[60] hidden overflow-y-auto" 
-     x-data="{ show: false }"
-     x-show="show"
-     x-cloak
-     @keydown.escape.window="closeAgendaModal()">
+     class="fixed inset-0 z-[60] hidden overflow-y-auto">
     
     {{-- Backdrop --}}
     <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" 
-         @click="closeAgendaModal()"></div>
+         onclick="closeAgendaModal()"></div>
     
     {{-- Modal Box --}}
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all">
+    <div class="flex items-center justify-center min-h-screen p-4 relative pointer-events-none">
+        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all pointer-events-auto">
             {{-- Modal Header with Subject Banner --}}
             <div id="modalBanner" class="h-32 bg-gradient-to-r from-blue-600 to-indigo-700 p-8 flex items-end relative">
-                <button @click="closeAgendaModal()" class="absolute top-6 right-6 text-white/70 hover:text-white transition-colors">
+                <button onclick="closeAgendaModal()" class="absolute top-6 right-6 text-white/70 hover:text-white transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -268,7 +264,7 @@
 
                 {{-- Footer --}}
                 <div class="mt-10 flex justify-end">
-                    <button @click="closeAgendaModal()" 
+                    <button onclick="closeAgendaModal()" 
                             class="px-8 py-3 bg-gray-100 text-gray-700 rounded-2xl text-sm font-bold hover:bg-gray-200 transition-all">
                         Tutup
                     </button>
@@ -284,6 +280,7 @@
     function openAgendaModal(id) {
         const modal = document.getElementById('agendaModal');
         modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Lock scroll
         
         // Show loading state or reset
         document.getElementById('modalTitle').innerText = 'Memuat...';
@@ -325,7 +322,16 @@
     }
     
     function closeAgendaModal() {
-        document.getElementById('agendaModal').classList.add('hidden');
+        const modal = document.getElementById('agendaModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = ''; // Restore scroll
     }
+
+    // Close on Escape
+    window.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeAgendaModal();
+        }
+    });
 </script>
 @endpush

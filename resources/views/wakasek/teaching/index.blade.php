@@ -51,7 +51,7 @@
                                 </div>
                             </td>
                             <td class="px-8 py-6 text-center">
-                                <span class="px-4 py-1.5 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-emerald-100">
+                                <span class="inline-flex items-center justify-center whitespace-nowrap px-4 py-1.5 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-emerald-100">
                                     {{ $teacher->agendas_count }} Sesi
                                 </span>
                             </td>

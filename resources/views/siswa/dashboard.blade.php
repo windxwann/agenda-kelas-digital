@@ -37,53 +37,30 @@
     </div>
 
     {{-- Stats Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <div class="flex items-center justify-between mb-3">
-                <div class="p-2 bg-gray-100 rounded-xl">
-                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
-            <p class="text-2xl font-bold text-gray-900">{{ $attendance_stats['total'] }}</p>
-            <p class="text-xs text-gray-500 mt-1">Total Pertemuan</p>
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:border-gray-200 transition-all">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total</p>
+            <p class="text-2xl font-black text-gray-900">{{ $attendance_stats['total'] }}</p>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <div class="flex items-center justify-between mb-3">
-                <div class="p-2 bg-green-100 rounded-xl">
-                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
-            </div>
-            <p class="text-2xl font-bold text-green-600">{{ $attendance_stats['present'] }}</p>
-            <p class="text-xs text-gray-500 mt-1">Hadir</p>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:border-emerald-200 transition-all">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Hadir</p>
+            <p class="text-2xl font-black text-emerald-600">{{ $attendance_stats['present'] ?? 0 }}</p>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <div class="flex items-center justify-between mb-3">
-                <div class="p-2 bg-blue-100 rounded-xl">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
-            <p class="text-2xl font-bold text-blue-600">{{ $attendance_stats['excused'] }}</p>
-            <p class="text-xs text-gray-500 mt-1">Izin / Sakit</p>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:border-amber-200 transition-all">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Terlambat</p>
+            <p class="text-2xl font-black text-amber-600">{{ $attendance_stats['late'] ?? 0 }}</p>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <div class="flex items-center justify-between mb-3">
-                <div class="p-2 bg-purple-100 rounded-xl">
-                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                </div>
-            </div>
-            <p class="text-2xl font-bold text-purple-600">{{ $attendance_stats['percentage'] }}%</p>
-            <p class="text-xs text-gray-500 mt-1">Kehadiran</p>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:border-sky-200 transition-all">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Izin / Sakit</p>
+            <p class="text-2xl font-black text-sky-600">{{ ($attendance_stats['excused'] ?? 0) + ($attendance_stats['sick'] ?? 0) }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:border-purple-200 transition-all">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Kehadiran</p>
+            <p class="text-2xl font-black text-purple-600">{{ $attendance_stats['percentage'] }}%</p>
         </div>
     </div>
 
@@ -191,8 +168,8 @@
                 <p class="text-xs text-gray-500">6 bulan terakhir</p>
             </div>
         </div>
-        <div class="h-80">
-            <div id="attendanceChart" class="h-full"></div>
+        <div class="overflow-x-auto">
+            <div id="attendanceChart" class="min-w-[600px] h-80"></div>
         </div>
     </div>
 @endsection
@@ -202,86 +179,52 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const monthlyData = @json($monthly_attendance);
+        if(!monthlyData || monthlyData.length === 0) return;
         
         var options = {
             series: [{
                 name: 'Hadir',
-                data: monthlyData.map(item => item.present),
-                color: '#10B981' // emerald-500
+                data: monthlyData.map(item => item.present)
             }, {
-                name: 'Izin / Sakit',
-                data: monthlyData.map(item => item.excused),
-                color: '#3B82F6' // blue-500
+                name: 'Terlambat',
+                data: monthlyData.map(item => item.late)
             }, {
                 name: 'Alpha',
-                data: monthlyData.map(item => item.absent),
-                color: '#EF4444' // red-500
+                data: monthlyData.map(item => item.absent)
+            }, {
+                name: 'Izin',
+                data: monthlyData.map(item => item.excused)
+            }, {
+                name: 'Sakit',
+                data: monthlyData.map(item => item.sick)
             }],
             chart: {
+                height: 300,
                 type: 'bar',
-                height: 320,
                 stacked: true,
                 toolbar: { show: false },
-                zoom: { enabled: false },
                 fontFamily: 'Inter, sans-serif'
             },
             plotOptions: {
                 bar: {
-                    horizontal: false,
-                    borderRadius: 6,
-                    columnWidth: '35%',
-                },
+                    columnWidth: '40%',
+                    borderRadius: 4
+                }
             },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                width: 3,
-                colors: ['#ffffff'] // Add clean white space between stacked segments
-            },
+            colors: ['#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#6B7280'], // Hijau, Oranye, Merah, Biru, Abu-abu
             xaxis: {
                 categories: monthlyData.map(item => item.month),
-                axisBorder: { show: false },
-                axisTicks: { show: false },
-                labels: {
-                    style: { colors: '#94a3b8', fontWeight: 600, fontSize: '13px' }
-                }
+                labels: { style: { colors: '#94a3b8', fontSize: '11px' } }
             },
             yaxis: {
-                labels: {
-                    style: { colors: '#94a3b8', fontWeight: 600 },
-                    formatter: (value) => { return Math.round(value) } // Only whole numbers for days
-                }
-            },
-            grid: {
-                borderColor: '#f1f5f9',
-                strokeDashArray: 4,
-                yaxis: { lines: { show: true } },
-                padding: { top: 0, right: 0, bottom: 0, left: 10 }
+                labels: { style: { colors: '#94a3b8', fontSize: '11px' } }
             },
             legend: {
                 position: 'top',
-                horizontalAlign: 'right',
-                markers: { radius: 12 },
-                itemMargin: { horizontal: 15, vertical: 5 },
-                fontSize: '14px',
-                fontWeight: 600,
-                labels: { colors: '#475569' }
-            },
-            fill: {
-                opacity: 1
+                horizontalAlign: 'center'
             },
             tooltip: {
-                theme: 'light',
-                y: {
-                    formatter: function (val) {
-                        return val + " Hari"
-                    }
-                },
-                style: {
-                    fontSize: '13px',
-                    fontFamily: 'Inter, sans-serif'
-                }
+                theme: 'light'
             }
         };
 

@@ -17,15 +17,25 @@ class DashboardController extends Controller
         $user = Auth::user();
         $classId = $user->class_id;
 
-        // Statistics (matching DB enum: present, absent, late, excused)
+        // Statistics (matching DB enum: present, absent, late, excused, sick)
+        $total = Attendance::where('student_id', $user->id)->count();
+        $present = Attendance::where('student_id', $user->id)->where('status', 'present')->count();
+        $late = Attendance::where('student_id', $user->id)->where('status', 'late')->count();
+        $excused = Attendance::where('student_id', $user->id)->where('status', 'excused')->count();
+        $absent = Attendance::where('student_id', $user->id)->where('status', 'absent')->count();
+        $sick = Attendance::where('student_id', $user->id)->where('status', 'sick')->count();
+
         $attendance_stats = [
-            'total' => Attendance::where('student_id', $user->id)->count(),
-            'present' => Attendance::where('student_id', $user->id)->whereIn('status', ['present', 'late'])->count(),
-            'excused' => Attendance::where('student_id', $user->id)->where('status', 'excused')->count(),
+            'total' => $total,
+            'present' => $present,
+            'late' => $late,
+            'excused' => $excused,
+            'absent' => $absent,
+            'sick' => $sick,
         ];
         
-        $attendance_stats['percentage'] = $attendance_stats['total'] > 0 
-            ? round(($attendance_stats['present'] / $attendance_stats['total']) * 100) 
+        $attendance_stats['percentage'] = $total > 0 
+            ? round((($present + $late) / $total) * 100) 
             : 0;
 
         // Recent Agendas
@@ -49,9 +59,11 @@ class DashboardController extends Controller
             $month = Carbon::now()->subMonths($i);
             $monthly_attendance->push([
                 'month' => $month->translatedFormat('F'),
-                'present' => Attendance::where('student_id', $user->id)->whereIn('status', ['present', 'late'])->whereMonth('date', $month->month)->count(),
+                'present' => Attendance::where('student_id', $user->id)->where('status', 'present')->whereMonth('date', $month->month)->count(),
+                'late' => Attendance::where('student_id', $user->id)->where('status', 'late')->whereMonth('date', $month->month)->count(),
                 'excused' => Attendance::where('student_id', $user->id)->where('status', 'excused')->whereMonth('date', $month->month)->count(),
                 'absent' => Attendance::where('student_id', $user->id)->where('status', 'absent')->whereMonth('date', $month->month)->count(),
+                'sick' => Attendance::where('student_id', $user->id)->where('status', 'sick')->whereMonth('date', $month->month)->count(),
             ]);
         }
 

@@ -75,11 +75,19 @@
                     </div>
 
                     <a href="{{ route('wali-kelas.attendance.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all group {{ request()->routeIs('wali-kelas.attendance.*') ? 'bg-indigo-50 text-indigo-600' : '' }}">
-                        <svg class="w-5 h-5 {{ request()->routeIs('wali-kelas.attendance.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all group {{ request()->routeIs('wali-kelas.attendance.index') ? 'bg-indigo-50 text-indigo-600' : '' }}">
+                        <svg class="w-5 h-5 {{ request()->routeIs('wali-kelas.attendance.index') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                         </svg>
-                        <span class="ml-3 font-medium">Presensi Siswa</span>
+                        <span class="ml-3 font-medium">Presensi Harian</span>
+                    </a>
+
+                    <a href="{{ route('wali-kelas.attendance.report') }}" 
+                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all group {{ request()->routeIs('wali-kelas.attendance.report') ? 'bg-indigo-50 text-indigo-600' : '' }}">
+                        <svg class="w-5 h-5 {{ request()->routeIs('wali-kelas.attendance.report') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="ml-3 font-medium">Laporan Bulanan</span>
                     </a>
 
                     <a href="{{ route('wali-kelas.agenda.index') }}" 
@@ -107,7 +115,7 @@
                         <svg class="w-5 h-5 {{ request()->routeIs('wali-kelas.export.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                         </svg>
-                        <span class="ml-3 font-medium">Rekap Presensi</span>
+                        <span class="ml-3 font-medium">Rekap Semester</span>
                     </a>
 
                     @if(Auth::user()->hasRole('teacher') || Auth::user()->hasRole('wakasek_kurikulum'))

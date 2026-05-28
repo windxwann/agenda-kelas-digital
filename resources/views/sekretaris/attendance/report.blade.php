@@ -10,7 +10,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
             <h1 class="text-3xl font-black text-gray-900 tracking-tight">Laporan Presensi</h1>
-            <p class="text-gray-500 mt-1 font-medium text-sm">Analisis data kehadiran siswa berdasarkan filter periode dan kelas.</p>
+            <p class="text-gray-500 mt-1 font-medium text-sm">Analisis data kehadiran siswa berdasarkan filter periode.</p>
         </div>
         <div class="flex flex-wrap gap-3">
             <a href="{{ route('sekretaris.print.attendance', request()->query()) }}" target="_blank"
@@ -21,210 +21,121 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <form method="GET" action="{{ route('sekretaris.attendance.report') }}" class="flex flex-col lg:flex-row gap-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 flex-1 gap-4">
-                <!-- Filter Tanggal Mulai -->
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Dari Tanggal</label>
-                    <input type="date" name="start_date" value="{{ request('start_date') }}" onchange="this.form.submit()"
-                           class="w-full px-6 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-bold">
-                </div>
-
-                <!-- Filter Tanggal Akhir -->
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Sampai Tanggal</label>
-                    <input type="date" name="end_date" value="{{ request('end_date') }}" onchange="this.form.submit()"
-                           class="w-full px-6 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-bold">
-                </div>
-
-                <!-- Filter Status -->
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Status Kehadiran</label>
-                    <div class="relative">
-                        <select name="status" onchange="this.form.submit()" 
-                                class="appearance-none block w-full pl-4 pr-10 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-bold">
-                            <option value="">Semua Status</option>
-                            <option value="present" {{ request('status') == 'present' ? 'selected' : '' }}>Hadir</option>
-                            <option value="absent" {{ request('status') == 'absent' ? 'selected' : '' }}>Alpha</option>
-                            <option value="sick" {{ request('status') == 'sick' ? 'selected' : '' }}>Sakit</option>
-                            <option value="late" {{ request('status') == 'late' ? 'selected' : '' }}>Terlambat</option>
-                            <option value="excused" {{ request('status') == 'excused' ? 'selected' : '' }}>Izin</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
-                    </div>
-                </div>
+    <!-- Filter Form -->
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+        <div class="flex items-center mb-6 pb-2 border-b border-gray-50">
+            <div class="w-2 h-6 bg-blue-600 rounded-full mr-3"></div>
+            <h3 class="text-lg font-bold text-gray-900">Filter Pencarian</h3>
+        </div>
+        <form method="GET" action="{{ route('sekretaris.attendance.report') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Tanggal Mulai</label>
+                <input type="date" name="start_date" value="{{ request('start_date') }}" 
+                       class="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-medium">
             </div>
-
-            <!-- Action Buttons -->
-            <div class="flex items-end gap-2">
-                <button type="submit" class="p-3.5 text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 transition-all h-[50px] flex items-center justify-center min-w-[50px]">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Tanggal Akhir</label>
+                <input type="date" name="end_date" value="{{ request('end_date') }}" 
+                       class="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-medium">
+            </div>
+            <div class="flex items-end pt-4">
+                <button type="submit" class="w-full px-10 py-3.5 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 flex items-center justify-center">
+                    Tampilkan Laporan
                 </button>
-                
-                @if(request()->anyFilled(['start_date', 'end_date', 'status']))
-                    <a href="{{ route('sekretaris.attendance.report') }}" 
-                       class="p-3.5 text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all h-[50px] flex items-center justify-center min-w-[50px]" 
-                       title="Reset Filter">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </a>
-                @endif
             </div>
         </form>
-
-        <!-- Search Info -->
-        @if(request('start_date') || request('end_date') || request('status'))
-            <div class="mt-4 flex flex-wrap items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest gap-2">
-                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span>Filter aktif:</span>
-                @if(request('start_date')) <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Mulai: {{ request('start_date') }}</span> @endif
-                @if(request('end_date')) <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Sampai: {{ request('end_date') }}</span> @endif
-                @if(request('status')) <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Status: {{ ucfirst(request('status')) }}</span> @endif
-            </div>
-        @endif
     </div>
     
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 group">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Record</p>
-                    <p class="text-3xl font-black text-gray-900 mt-1">{{ $summary['total'] }}</p>
-                </div>
-                <div class="w-12 h-12 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                </div>
-            </div>
+    <!-- Summary Stats Bar -->
+    <div class="flex flex-wrap items-center gap-6 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-gray-900"></span>
+            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total:</span>
+            <span class="text-sm font-black text-gray-900">{{ $summary['total'] }}</span>
         </div>
-        
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 group hover:border-orange-500 transition-all">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Sakit</p>
-                    <p class="text-3xl font-black text-orange-600 mt-1">{{ $summary['sick'] }}</p>
-                </div>
-                <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                </div>
-            </div>
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Hadir:</span>
+            <span class="text-sm font-black text-emerald-600">{{ $summary['present'] }}</span>
         </div>
-        
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 group hover:border-indigo-500 transition-all">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Hadir</p>
-                    <p class="text-3xl font-black text-indigo-600 mt-1">{{ $summary['present'] }}</p>
-                </div>
-                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-            </div>
-            <div class="mt-4 w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                @php $presentPct = $summary['total'] > 0 ? ($summary['present'] / $summary['total']) * 100 : 0; @endphp
-                <div class="bg-indigo-500 h-full rounded-full transition-all duration-1000" style="width: {{ $presentPct }}%"></div>
-            </div>
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Alpha:</span>
+            <span class="text-sm font-black text-rose-600">{{ $summary['absent'] }}</span>
         </div>
-        
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 group hover:border-rose-500 transition-all">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Alpha</p>
-                    <p class="text-3xl font-black text-rose-600 mt-1">{{ $summary['absent'] }}</p>
-                </div>
-                <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-            </div>
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Sakit:</span>
+            <span class="text-sm font-black text-orange-600">{{ $summary['sick'] }}</span>
         </div>
-        
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 group hover:border-blue-500 transition-all">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Persentase</p>
-                    <p class="text-3xl font-black text-blue-600 mt-1">{{ round($presentPct, 1) }}%</p>
-                </div>
-                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                </div>
-            </div>
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-sky-500"></span>
+            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Izin:</span>
+            <span class="text-sm font-black text-sky-600">{{ $summary['excused'] }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Terlambat:</span>
+            <span class="text-sm font-black text-amber-600">{{ $summary['late'] }}</span>
         </div>
     </div>
     
-    <!-- Table -->
+    <!-- Tabel Data Presensi -->
     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-            <h3 class="text-lg font-bold text-gray-900">Rincian Data Presensi</h3>
-            <span class="px-4 py-1.5 bg-white text-[10px] font-bold text-gray-400 uppercase tracking-widest rounded-xl border border-gray-100">{{ $attendances->total() }} Records Found</span>
+        <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
+            <h3 class="text-lg font-bold text-gray-900">Data Ringkasan Presensi Siswa</h3>
+            <span class="px-4 py-1.5 bg-white text-[10px] font-bold text-gray-400 uppercase tracking-widest rounded-xl border border-gray-100">{{ $students->total() }} Siswa</span>
         </div>
         
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-100">
                 <thead>
                     <tr class="bg-gray-50/30">
-                        <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tanggal</th>
                         <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Siswa</th>
                         <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kelas</th>
-                        <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                        <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Keterangan</th>
+                        <th class="px-8 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hadir</th>
+                        <th class="px-8 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alpha</th>
+                        <th class="px-8 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sakit</th>
+                        <th class="px-8 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Izin</th>
+                        <th class="px-8 py-4 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Terlambat</th>
+                        <th class="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-50">
-                    @forelse($attendances as $attendance)
+                    @forelse($students as $student)
                     <tr class="hover:bg-gray-50/50 transition-colors">
                         <td class="px-8 py-4 whitespace-nowrap">
-                            <div class="text-sm font-bold text-gray-900">{{ \Carbon\Carbon::parse($attendance->date)->translatedFormat('d M Y') }}</div>
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-[10px] font-black mr-3">
-                                    {{ strtoupper(substr($attendance->student->name, 0, 1)) }}
+                                <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white text-[10px] font-black shadow-sm mr-3">
+                                    {{ strtoupper(substr($student->name, 0, 1)) }}
                                 </div>
                                 <div class="min-w-0">
-                                    <div class="text-sm font-bold text-gray-900 truncate">{{ $attendance->student->name }}</div>
-                                    <div class="text-[10px] font-medium text-gray-400">NIS: {{ $attendance->student->nis }}</div>
+                                    <div class="text-sm font-bold text-gray-900 truncate">{{ $student->name }}</div>
+                                    <div class="text-[10px] font-medium text-gray-400">NIS: {{ $student->nis }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-8 py-4 whitespace-nowrap">
                             <span class="px-3 py-1 text-[10px] font-bold bg-blue-50 text-blue-700 rounded-lg border border-blue-100 uppercase tracking-wider">
-                                {{ $attendance->student->class->name ?? '-' }}
+                                {{ $student->class->name ?? '-' }}
                             </span>
                         </td>
+                        <td class="px-8 py-4 text-center text-sm font-bold text-emerald-600">{{ $student->attendances->where('status', 'present')->count() }}</td>
+                        <td class="px-8 py-4 text-center text-sm font-bold text-rose-600">{{ $student->attendances->where('status', 'absent')->count() }}</td>
+                        <td class="px-8 py-4 text-center text-sm font-bold text-orange-600">{{ $student->attendances->where('status', 'sick')->count() }}</td>
+                        <td class="px-8 py-4 text-center text-sm font-bold text-sky-600">{{ $student->attendances->where('status', 'excused')->count() }}</td>
+                        <td class="px-8 py-4 text-center text-sm font-bold text-amber-600">{{ $student->attendances->where('status', 'late')->count() }}</td>
                         <td class="px-8 py-4 whitespace-nowrap">
-                            @php
-                                $statusStyles = [
-                                    'present' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
-                                    'absent' => 'bg-rose-50 text-rose-700 border-rose-100',
-                                    'sick' => 'bg-orange-50 text-orange-700 border-orange-100',
-                                    'late' => 'bg-amber-50 text-amber-700 border-amber-100',
-                                    'excused' => 'bg-sky-50 text-sky-700 border-sky-100'
-                                ];
-                                $statusLabels = ['present' => 'Hadir', 'absent' => 'Alpha', 'sick' => 'Sakit', 'late' => 'Terlambat', 'excused' => 'Izin'];
-                                $style = $statusStyles[$attendance->status] ?? 'bg-gray-50 text-gray-700 border-gray-100';
-                            @endphp
-                            <span class="px-3 py-1 text-[10px] font-black {{ $style }} rounded-lg border uppercase tracking-widest">
-                                {{ $statusLabels[$attendance->status] ?? $attendance->status }}
-                            </span>
-                        </td>
-                        <td class="px-8 py-4 text-xs font-medium text-gray-500 italic truncate max-w-xs">
-                            {{ $attendance->note ?? '-' }}
+                            <button onclick="viewStudentAttendance({{ $student->id }}, '{{ $student->name }}')" 
+                                    class="text-blue-600 hover:text-blue-900 font-bold text-xs uppercase tracking-wider">
+                                Lihat Detail
+                            </button>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-8 py-20 text-center">
-                            <div class="flex flex-col items-center">
-                                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                                    <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                </div>
-                                <h3 class="text-lg font-bold text-gray-900">Data Tidak Ditemukan</h3>
-                                <p class="text-gray-500 mt-1">Sesuaikan filter untuk mencari data presensi.</p>
-                            </div>
+                        <td colspan="8" class="px-8 py-20 text-center">
+                            <div class="text-gray-500">Tidak ada data siswa ditemukan.</div>
                         </td>
                     </tr>
                     @endforelse
@@ -232,11 +143,96 @@
             </table>
         </div>
         
-        @if($attendances->hasPages())
+        @if($students->hasPages())
         <div class="px-8 py-6 border-t border-gray-50 bg-gray-50/30">
-            {{ $attendances->appends(request()->query())->links() }}
+            {{ $students->appends(request()->query())->links() }}
         </div>
         @endif
     </div>
 </div>
+
+<!-- Modal Detail Presensi -->
+<div id="attendanceModal" class="fixed inset-0 bg-gray-900/10 backdrop-blur-md hidden items-center justify-center z-50">
+    <div class="bg-white/90 rounded-3xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden border border-white/50 backdrop-blur-md">
+        <div class="px-8 py-6 border-b border-gray-200/50 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-gray-900" id="modalTitle">Detail Presensi</h3>
+            <div class="flex items-center gap-2">
+                <select id="monthFilter" onchange="loadStudentData()" class="bg-gray-50 border-transparent rounded-xl text-xs font-bold text-gray-600 px-3 py-2">
+                    @foreach(range(1, 12) as $m)
+                        <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}" {{ date('m') == $m ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+                        </option>
+                    @endforeach
+                </select>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        </div>
+        <div class="px-8 py-6 max-h-[60vh] overflow-y-auto">
+            <table class="min-w-full divide-y divide-gray-100">
+                <thead>
+                    <tr>
+                        <th class="px-2 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tanggal</th>
+                        <th class="px-2 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
+                        <th class="px-2 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody id="modalBody" class="divide-y divide-gray-50">
+                    <!-- Data akan dimuat lewat JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentStudentId = null;
+    let currentStudentName = '';
+
+    async function viewStudentAttendance(studentId, studentName) {
+        currentStudentId = studentId;
+        currentStudentName = studentName;
+        loadStudentData();
+    }
+
+    async function loadStudentData() {
+        document.getElementById('modalTitle').innerText = 'Detail Presensi: ' + currentStudentName;
+        const month = document.getElementById('monthFilter').value;
+        const modalBody = document.getElementById('modalBody');
+        
+        modalBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500 italic">Memuat data...</td></tr>';
+        document.getElementById('attendanceModal').classList.remove('hidden');
+        document.getElementById('attendanceModal').classList.add('flex');
+
+        try {
+            const response = await fetch(`/sekretaris/attendance/report/student/${currentStudentId}?month=${month}&year={{ date('Y') }}`);
+            const student = await response.json();
+            
+            modalBody.innerHTML = '';
+            if (student.attendances.length === 0) {
+                modalBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500">Tidak ada riwayat presensi di bulan ini.</td></tr>';
+            } else {
+                const statusLabels = {'present': 'Hadir', 'absent': 'Alpha', 'sick': 'Sakit', 'late': 'Terlambat', 'excused': 'Izin'};
+                student.attendances.forEach(att => {
+                    modalBody.innerHTML += `
+                        <tr>
+                            <td class="px-2 py-3 text-sm text-gray-900 font-medium">${att.date}</td>
+                            <td class="px-2 py-3 text-sm font-bold text-gray-700">${statusLabels[att.status] || att.status}</td>
+                            <td class="px-2 py-3 text-sm text-gray-500">${att.note || '-'}</td>
+                        </tr>
+                    `;
+                });
+            }
+        } catch (error) {
+            modalBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-rose-500 font-medium">Gagal memuat data.</td></tr>';
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('attendanceModal').classList.add('hidden');
+        document.getElementById('attendanceModal').classList.remove('flex');
+    }
+</script>
 @endsection
+

@@ -73,12 +73,36 @@ class DashboardController extends Controller
             ->orderBy('month')
             ->get();
 
+        // Status Ruangan (Dinamis dari tabel rooms)
+        $rooms = \App\Models\Room::where('is_active', true)->get();
+        $room_status = $rooms->mapWithKeys(function ($room) {
+            $now = now();
+            // Ambil jadwal aktif jika ada
+            $activeSchedule = \App\Models\Schedule::currentlyOccupied($now)
+                ->where(function($q) use ($room) {
+                    $q->where('room_id', $room->id)
+                      ->orWhere('room', $room->name);
+                })
+                ->with(['class', 'teacher'])
+                ->first();
+
+            return [$room->name => [
+                'status' => $activeSchedule ? 'occupied' : 'available',
+                'details' => $activeSchedule ? [
+                    'class' => $activeSchedule->class->name ?? '-',
+                    'teacher' => $activeSchedule->teacher->name ?? '-',
+                    'end_time' => \Carbon\Carbon::parse($activeSchedule->end_time)->format('H:i')
+                ] : null
+            ]];
+        });
+
         return [
             'stats' => $stats, 
             'recent_activities' => $recent_activities, 
             'class_distribution' => $class_distribution,
             'today_attendance' => $today_attendance,
-            'monthly_agendas' => $monthly_agendas
+            'monthly_agendas' => $monthly_agendas,
+            'room_status' => $room_status
         ];
     }
 

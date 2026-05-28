@@ -48,8 +48,13 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('su
     Route::resource('schedules', ScheduleController::class);
     Route::get('schedules/class/{class}', [ScheduleController::class, 'byClass'])->name('schedules.byClass');
     
-    // Laporan
+    // Manajemen Ruangan
+    Route::resource('rooms', \App\Http\Controllers\Admin\RoomController::class);
+
+    // Monitoring
+    Route::get('monitoring/rooms', [\App\Http\Controllers\Admin\MonitoringController::class, 'rooms'])->name('monitoring.rooms');
     Route::get('reports/attendance', [ReportController::class, 'attendance'])->name('reports.attendance');
+    Route::get('reports/attendance/student/{id}', [ReportController::class, 'studentAttendance'])->name('reports.attendance.student');
     Route::get('reports/export/pdf', [ReportController::class, 'exportPDF'])->name('reports.export.pdf');
     Route::get('reports/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export.excel');
     
@@ -102,8 +107,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Manajemen Jadwal
     Route::resource('schedules', ScheduleController::class);
     
-    // Laporan
+    // Manajemen Ruangan
+    Route::resource('rooms', \App\Http\Controllers\Admin\RoomController::class);
+
+    // Monitoring
+    Route::get('monitoring/rooms', [\App\Http\Controllers\Admin\MonitoringController::class, 'rooms'])->name('monitoring.rooms');
     Route::get('reports/attendance', [ReportController::class, 'attendance'])->name('reports.attendance');
+    Route::get('reports/attendance/student/{id}', [ReportController::class, 'studentAttendance'])->name('reports.attendance.student');
     Route::get('reports/export/pdf', [ReportController::class, 'exportPDF'])->name('reports.export.pdf');
     Route::get('reports/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export.excel');
     
@@ -147,6 +157,7 @@ Route::middleware(['auth', 'role:sekretaris'])->prefix('sekretaris')->name('sekr
     Route::get('/attendance/store', function() { return redirect()->route('sekretaris.attendance.index'); });
     Route::post('/attendance/store', [App\Http\Controllers\Sekretaris\AttendanceController::class, 'store'])->name('attendance.store');
     Route::get('/attendance/report', [App\Http\Controllers\Sekretaris\AttendanceController::class, 'report'])->name('attendance.report');
+    Route::get('/attendance/report/student/{id}', [App\Http\Controllers\Sekretaris\AttendanceController::class, 'studentAttendance'])->name('attendance.report.student');
     
     // Cetak Laporan
     Route::get('/print/agenda', [App\Http\Controllers\Sekretaris\PrintController::class, 'printAgenda'])->name('print.agenda');
@@ -159,6 +170,8 @@ Route::middleware(['auth', 'role:wali_kelas'])->prefix('wali-kelas')->name('wali
     
     // Monitoring Presensi
     Route::get('/attendance', [App\Http\Controllers\WaliKelas\AttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('/attendance/report', [App\Http\Controllers\WaliKelas\AttendanceController::class, 'report'])->name('attendance.report');
+    Route::get('/attendance/report/student/{id}', [App\Http\Controllers\WaliKelas\AttendanceController::class, 'studentAttendance'])->name('attendance.report.student');
     Route::get('/attendance/chart', [App\Http\Controllers\WaliKelas\AttendanceController::class, 'chart'])->name('attendance.chart');
     
     // Agenda Kelas (Read Only)

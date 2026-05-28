@@ -85,19 +85,21 @@ class DashboardController extends Controller
             
             $monthStats = $attendanceStats->where('month_key', $monthKey);
             
-            $present = $monthStats->whereIn('status', ['present', 'late'])->sum('total');
+            $present = $monthStats->where('status', 'present')->sum('total');
+            $late = $monthStats->where('status', 'late')->sum('total');
             $excused = $monthStats->where('status', 'excused')->sum('total');
             $absent = $monthStats->where('status', 'absent')->sum('total');
             $sick = $monthStats->where('status', 'sick')->sum('total');
-            $total = $present + $excused + $absent + $sick;
+            $total = $present + $late + $excused + $absent + $sick;
             
             $monthly_attendance->push([
                 'month' => $date->translatedFormat('F'),
                 'present' => (int)$present,
+                'late' => (int)$late,
                 'excused' => (int)$excused,
                 'absent' => (int)$absent,
                 'sick' => (int)$sick,
-                'percentage' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+                'percentage' => $total > 0 ? round((($present + $late) / $total) * 100, 1) : 0,
             ]);
         }
         

@@ -74,34 +74,49 @@ class AttendanceController extends Controller
         }
 
         $classes = Classes::where('id', $classId)->get();
-        $query = Attendance::whereHas('student', function($q) use ($classId) {
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        $query = User::role('siswa')->where('class_id', $classId);
+        
+        $students = $query->with(['class', 'attendances' => function($q) use ($startDate, $endDate) {
+            if ($startDate) $q->whereDate('date', '>=', $startDate);
+            if ($endDate) $q->whereDate('date', '<=', $endDate);
+        }])->orderBy('name', 'asc')->paginate(50);
+        
+        // Summary for cards
+        $attQuery = Attendance::whereHas('student', function($q) use ($classId) {
             $q->where('class_id', $classId);
-        })->with(['student.class']);
+        });
+        if ($startDate) $attQuery->whereDate('date', '>=', $startDate);
+        if ($endDate) $attQuery->whereDate('date', '<=', $endDate);
         
-        if ($request->start_date) {
-            $query->where('date', '>=', $request->start_date);
-        }
-        
-        if ($request->end_date) {
-            $query->where('date', '<=', $request->end_date);
-        }
-        
-        if ($request->status) {
-            $query->where('status', $request->status);
-        }
-        
-        // Summary for cards (calculated before paginate() to prevent offset/limit from zeroing out counts)
         $summary = [
-            'total' => (clone $query)->count(),
-            'present' => (clone $query)->where('status', 'present')->count(),
-            'absent' => (clone $query)->where('status', 'absent')->count(),
-            'late' => (clone $query)->where('status', 'late')->count(),
-            'excused' => (clone $query)->where('status', 'excused')->count(),
-            'sick' => (clone $query)->where('status', 'sick')->count(),
+            'total' => (clone $attQuery)->count(),
+            'present' => (clone $attQuery)->where('status', 'present')->count(),
+            'absent' => (clone $attQuery)->where('status', 'absent')->count(),
+            'late' => (clone $attQuery)->where('status', 'late')->count(),
+            'excused' => (clone $attQuery)->where('status', 'excused')->count(),
+            'sick' => (clone $attQuery)->where('status', 'sick')->count(),
         ];
         
-        $attendances = $query->latest('date')->paginate(15);
+        return view('sekretaris.attendance.report', compact('classes', 'students', 'summary'));
+    }
+
+    public function studentAttendance(Request $request, $id)
+    {
+        $classId = Auth::user()->class_id;
+        $month = $request->query('month', date('m'));
+        $year = $request->query('year', date('Y'));
         
-        return view('sekretaris.attendance.report', compact('classes', 'attendances', 'summary'));
+        $student = User::where('class_id', $classId)
+            ->with(['attendances' => function($q) use ($month, $year) {
+                $q->whereMonth('date', $month)
+                  ->whereYear('date', $year)
+                  ->latest('date');
+            }])
+            ->findOrFail($id);
+        
+        return response()->json($student);
     }
 }

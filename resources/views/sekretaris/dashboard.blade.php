@@ -231,119 +231,48 @@
         
         var options = {
             series: [{
-                name: 'Persentase Kehadiran',
-                type: 'area',
-                data: monthlyData.map(item => item.percentage)
+                name: 'Hadir',
+                data: monthlyData.map(item => item.present)
             }, {
-                name: 'Sakit',
-                type: 'column',
-                data: monthlyData.map(item => item.sick)
-            }, {
-                name: 'Izin',
-                type: 'column',
-                data: monthlyData.map(item => item.excused)
+                name: 'Terlambat',
+                data: monthlyData.map(item => item.late)
             }, {
                 name: 'Alpha',
-                type: 'column',
                 data: monthlyData.map(item => item.absent)
+            }, {
+                name: 'Izin',
+                data: monthlyData.map(item => item.excused)
+            }, {
+                name: 'Sakit',
+                data: monthlyData.map(item => item.sick)
             }],
             chart: {
                 height: 350,
-                type: 'line',
-                stacked: false,
+                type: 'bar',
+                stacked: true,
                 toolbar: { show: false },
-                zoom: { enabled: false },
                 fontFamily: 'Inter, sans-serif'
-            },
-            stroke: {
-                width: [4, 0, 0],
-                curve: 'smooth',
-                dashArray: [0, 0, 0]
             },
             plotOptions: {
                 bar: {
-                    columnWidth: '20%',
+                    columnWidth: '40%',
                     borderRadius: 4
                 }
             },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    inverseColors: false,
-                    shade: 'light',
-                    type: "vertical",
-                    opacityFrom: [0.4, 1, 1, 1],
-                    opacityTo: [0.1, 1, 1, 1],
-                    stops: [0, 90, 100]
-                }
-            },
-            colors: ['#6366f1', '#f97316', '#3b82f6', '#ef4444'],
-            labels: monthlyData.map(item => item.month),
-            markers: {
-                size: [5, 0, 0, 0],
-                colors: ['#ffffff'],
-                strokeColors: '#6366f1',
-                strokeWidth: 3,
-                hover: { size: 7 }
-            },
+            colors: ['#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#6B7280'], // Hijau, Oranye, Merah, Biru, Abu-abu
             xaxis: {
-                axisBorder: { show: false },
-                axisTicks: { show: false },
-                labels: { style: { colors: '#94a3b8', fontWeight: 600 } }
+                categories: monthlyData.map(item => item.month),
+                labels: { style: { colors: '#94a3b8', fontSize: '11px' } }
             },
-            yaxis: [
-                {
-                    title: {
-                        text: "Persentase (%)",
-                        style: { color: '#6366f1', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }
-                    },
-                    labels: {
-                        style: { colors: '#6366f1', fontWeight: 600 },
-                        formatter: (value) => { return Math.round(value) + '%' }
-                    },
-                    min: 0,
-                    max: 100,
-                    tickAmount: 5
-                },
-                {
-                    opposite: true,
-                    title: {
-                        text: "Jumlah Siswa",
-                        style: { color: '#475569', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }
-                    },
-                    labels: {
-                        style: { colors: '#475569', fontWeight: 600 },
-                        formatter: (value) => { return Math.round(value) }
-                    }
-                }
-            ],
-            grid: {
-                borderColor: '#f1f5f9',
-                strokeDashArray: 4,
-                padding: { top: 0, right: 20, bottom: 0, left: 20 }
+            yaxis: {
+                labels: { style: { colors: '#94a3b8', fontSize: '11px' } }
             },
             legend: {
                 position: 'top',
-                horizontalAlign: 'left',
-                offsetY: -10,
-                markers: { radius: 12, width: 10, height: 10 },
-                itemMargin: { horizontal: 15, vertical: 0 },
-                fontSize: '13px',
-                fontWeight: 600,
-                labels: { colors: '#475569' }
+                horizontalAlign: 'center'
             },
             tooltip: {
-                shared: true,
-                intersect: false,
-                theme: 'light',
-                y: {
-                    formatter: function (y, { seriesIndex }) {
-                        if (typeof y !== "undefined") {
-                            return seriesIndex === 0 ? y.toFixed(1) + "%" : y.toFixed(0) + " Siswa";
-                        }
-                        return y;
-                    }
-                }
+                theme: 'light'
             }
         };
 

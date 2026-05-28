@@ -21,43 +21,54 @@ class ReportController extends Controller
     public function attendance(Request $request)
     {
         $classes = Classes::all();
+        $classId = $request->class_id;
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        $query = User::role('siswa');
         
-        $query = Attendance::with(['student', 'student.class']);
-        
-        // Filter by class
-        if ($request->has('class_id') && $request->class_id) {
-            $query->whereHas('student', function($q) use ($request) {
-                $q->where('class_id', $request->class_id);
-            });
+        if ($classId) {
+            $query->where('class_id', $classId);
         }
+
+        // Ambil siswa dengan relasi presensi yang difilter
+        $students = $query->with(['class', 'attendances' => function($q) use ($startDate, $endDate) {
+            if ($startDate) $q->whereDate('date', '>=', $startDate);
+            if ($endDate) $q->whereDate('date', '<=', $endDate);
+        }])->orderBy('name', 'asc')->paginate(50);
+
+        // Hitung total ringkasan untuk kartu (tetap menggunakan query attendance log)
+        $attQuery = Attendance::query();
+        if ($startDate) $attQuery->whereDate('date', '>=', $startDate);
+        if ($endDate) $attQuery->whereDate('date', '<=', $endDate);
         
-        // Filter by date range
-        if ($request->has('start_date') && $request->start_date) {
-            $query->whereDate('date', '>=', $request->start_date);
-        }
-        
-        if ($request->has('end_date') && $request->end_date) {
-            $query->whereDate('date', '<=', $request->end_date);
-        }
-        
-        // Filter by status
-        if ($request->has('status') && $request->status) {
-            $query->where('status', $request->status);
-        }
-        
-        // Summary statistics (calculated before paginate() to prevent offset/limit from zeroing out counts)
         $summary = [
-            'total' => (clone $query)->count(),
-            'present' => (clone $query)->where('status', 'present')->count(),
-            'absent' => (clone $query)->where('status', 'absent')->count(),
-            'late' => (clone $query)->where('status', 'late')->count(),
-            'excused' => (clone $query)->where('status', 'excused')->count(),
-            'sick' => (clone $query)->where('status', 'sick')->count(),
+            'total' => (clone $attQuery)->count(),
+            'present' => (clone $attQuery)->where('status', 'present')->count(),
+            'absent' => (clone $attQuery)->where('status', 'absent')->count(),
+            'late' => (clone $attQuery)->where('status', 'late')->count(),
+            'excused' => (clone $attQuery)->where('status', 'excused')->count(),
+            'sick' => (clone $attQuery)->where('status', 'sick')->count(),
         ];
         
-        $attendances = $query->latest('date')->paginate(20);
+        return view('admin.reports.attendance', compact('students', 'classes', 'summary'));
+    }
+
+    /**
+     * Get attendance history for a specific student
+     */
+    public function studentAttendance(Request $request, $id)
+    {
+        $month = $request->query('month', date('m'));
+        $year = $request->query('year', date('Y'));
         
-        return view('admin.reports.attendance', compact('attendances', 'classes', 'summary'));
+        $student = User::with(['attendances' => function($q) use ($month, $year) {
+            $q->whereMonth('date', $month)
+              ->whereYear('date', $year)
+              ->latest('date');
+        }])->findOrFail($id);
+        
+        return response()->json($student);
     }
     
     /**

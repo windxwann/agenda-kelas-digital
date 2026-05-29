@@ -9,8 +9,24 @@
     $isSubmitted = isset($students) && $students->contains(function($s) {
         return $s->attendances->count() > 0;
     });
+
+    $initialStats = [
+        'present' => 0,
+        'sick' => 0,
+        'excused' => 0,
+        'late' => 0,
+        'absent' => 0
+    ];
+    if (isset($students)) {
+        foreach($students as $student) {
+            $status = $student->attendances->first()?->status ?? 'present';
+            if(isset($initialStats[$status])) {
+                $initialStats[$status]++;
+            }
+        }
+    }
 @endphp
-<div class="space-y-8 pb-8" x-data="attendanceManager()">
+<div class="space-y-8 pb-8" x-data='attendanceManager(@json($initialStats))'>
     <!-- Header Section -->
     <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-6">
         <div class="flex-1 min-w-0">
@@ -50,7 +66,8 @@
     </div>
 
     @if($selectedClassId)
-        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden relative">
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden relative"
+             @update-stats.window="updateStats($event.detail)">
             
             <!-- Soft Block / Locked Banner -->
             <template x-if="isLocked">
@@ -139,7 +156,7 @@
                                     $currentAttendance = $student->attendances->first();
                                 @endphp
                                 <tr class="hover:bg-gray-50/50 transition-colors group" 
-                                    x-show="shouldShow('{{ addslashes($student->name) }}')">
+                                    x-show='shouldShow(@json($student->name))'>
                                     <td class="px-8 py-6 whitespace-nowrap">
                                         <div class="flex items-center gap-4">
                                             <div class="w-10 h-10 bg-gray-50 text-gray-400 rounded-xl flex items-center justify-center text-xs font-bold border border-gray-100/50 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300">
@@ -157,10 +174,10 @@
                                                 status: '{{ $currentAttendance->status ?? 'present' }}',
                                                 init() { 
                                                     this.$watch('status', (val, old) => {
-                                                        $dispatch('update-stats', { newStatus: val, oldStatus: old });
+                                                        if (val !== old) {
+                                                            window.dispatchEvent(new CustomEvent('update-stats', { detail: { newStatus: val, oldStatus: old } }));
+                                                        }
                                                     });
-                                                    // Initial stats calculation
-                                                    $dispatch('register-student', { status: this.status });
                                                 }
                                              }" 
                                              :class="isLocked ? 'opacity-60 pointer-events-none grayscale-[50%]' : ''">
@@ -220,26 +237,19 @@
 
 @push('scripts')
 <script>
-    function attendanceManager() {
+    function attendanceManager(initialStats) {
         return {
             isLocked: {{ $isSubmitted ? 'true' : 'false' }},
             search: '',
-            stats: {
-                present: 0,
-                sick: 0,
-                excused: 0,
-                late: 0,
-                absent: 0
-            },
+            stats: initialStats,
             
-            init() {
-                this.$on('update-stats', (e) => {
-                    this.stats[e.detail.oldStatus]--;
-                    this.stats[e.detail.newStatus]++;
-                });
-                this.$on('register-student', (e) => {
-                    this.stats[e.detail.status]++;
-                });
+            updateStats(detail) {
+                if (this.stats[detail.oldStatus] !== undefined) {
+                    this.stats[detail.oldStatus]--;
+                }
+                if (this.stats[detail.newStatus] !== undefined) {
+                    this.stats[detail.newStatus]++;
+                }
             },
 
             unlock() {

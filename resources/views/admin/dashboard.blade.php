@@ -116,139 +116,47 @@
             </div>
         </div>
     </div>
-    
-    <!-- Middle Section: Distribution & Trends -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Class Distribution -->
-        <div class="bg-white rounded-3xl shadow-sm p-6 border border-gray-100 flex flex-col">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900">Distribusi Kelas</h3>
-                    <p class="text-xs text-gray-500">Rasio kapasitas siswa per kelas</p>
-                </div>
-                <a href="{{ route('admin.classes.index') }}" class="p-2 bg-gray-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all duration-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </a>
-            </div>
-            
-            <div class="space-y-5 overflow-y-auto pr-2 max-h-[360px] custom-scrollbar">
-                @forelse(($class_distribution ?? collect())->sortByDesc('count') as $class)
-                <div class="p-4 bg-gray-50/50 rounded-2xl border border-transparent hover:border-blue-100 hover:bg-white transition-all group">
-                    <div class="flex justify-between items-center mb-2">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-xs font-bold mr-3">
-                                {{ substr($class['name'], 0, 1) }}
-                            </div>
-                            <span class="font-bold text-gray-800 text-sm truncate max-w-[150px]">{{ $class['name'] }}</span>
-                        </div>
-                        <span class="text-[10px] font-bold text-gray-500 bg-white px-2 py-1 rounded-md border border-gray-100">{{ $class['count'] }} / {{ $class['capacity'] ?? 36 }}</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                        @php $percentage = (($class['count'] ?? 0) / ($class['capacity'] ?? 36)) * 100; @endphp
-                        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all duration-700" 
-                             style="width: {{ min($percentage, 100) }}%"></div>
-                    </div>
-                </div>
-                @empty
-                <p class="text-gray-400 text-center py-8 italic text-sm">Belum ada data kelas</p>
-                @endforelse
-            </div>
-        </div>
-        
-        <!-- Monthly Trends -->
-        <div class="bg-white rounded-3xl shadow-sm p-6 border border-gray-100 flex flex-col">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900">Aktivitas Agenda</h3>
-                    <p class="text-xs text-gray-500">Tren pengisian agenda bulanan</p>
-                </div>
-                <div class="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-100">
-                    <div class="px-3 py-1.5 text-[10px] font-bold text-indigo-600 bg-white rounded-lg shadow-sm flex items-center">
-                        <span class="w-1.5 h-1.5 bg-indigo-500 rounded-full mr-1.5 animate-pulse"></span>
-                        Batang
-                    </div>
-                    <div class="px-3 py-1.5 text-[10px] font-bold text-gray-400">Live</div>
-                </div>
-            </div>
 
-            <!-- Mini Metrics Grid inside Chart Card for Executive Premium View -->
-            <div class="grid grid-cols-2 gap-4 mb-5">
-                <div class="bg-indigo-50/40 rounded-2xl p-3 border border-indigo-100/50 flex items-center transition-all hover:bg-indigo-50">
-                    <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"></path></svg>
-                    </div>
-                    <div>
-                        <span class="text-[9px] font-bold text-indigo-500 block uppercase tracking-wider">Total Agenda</span>
-                        <span class="text-sm font-black text-indigo-950" id="agenda-total-metric">-</span>
-                    </div>
-                </div>
-                <div class="bg-violet-50/40 rounded-2xl p-3 border border-violet-100/50 flex items-center transition-all hover:bg-violet-50">
-                    <div class="w-8 h-8 bg-violet-100 text-violet-600 rounded-xl flex items-center justify-center mr-3 shadow-sm flex-shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    </div>
-                    <div>
-                        <span class="text-[9px] font-bold text-violet-500 block uppercase tracking-wider">Rata-Rata Bulanan</span>
-                        <span class="text-sm font-black text-violet-950" id="agenda-avg-metric">-</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex-1 min-h-[260px] relative">
-                <canvas id="agendaChart"></canvas>
-            </div>
-        </div>
-    </div>
-    
     <!-- Lower Section: Presensi & Aktivitas -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <!-- Today's Attendance -->
         <div class="bg-white rounded-3xl shadow-sm p-6 border border-gray-100">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h3 class="text-lg font-bold text-gray-900">Presensi Hari Ini</h3>
-                    <p class="text-xs text-gray-500">Statistik kehadiran siswa real-time</p>
+                    <h3 class="text-lg font-bold text-gray-900">Presensi Siswa Hari Ini</h3>
+                    <p class="text-xs text-gray-500">Statistik kehadiran real-time</p>
                 </div>
                 <div class="text-right">
                     <span id="stat-attendance-rate" class="text-2xl font-black text-blue-600">{{ $stats['attendance_rate'] ?? 0 }}%</span>
-                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Kehadiran Bulan Ini</p>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Bulan Ini</p>
                 </div>
             </div>
             
             <div id="today-attendance-container">
                 @if(isset($today_attendance) && $today_attendance->count() > 0)
-                    <div class="grid grid-cols-2 gap-4">
-                        @foreach($today_attendance as $attendance)
+                    <div class="flex flex-wrap gap-2">
+                        @php
+                            $statusMap = [
+                                'present' => ['text' => 'text-emerald-700', 'bg' => 'bg-emerald-50', 'label' => 'Hadir'],
+                                'sick' => ['text' => 'text-orange-700', 'bg' => 'bg-orange-50', 'label' => 'Sakit'],
+                                'excused' => ['text' => 'text-sky-700', 'bg' => 'bg-sky-50', 'label' => 'Izin'],
+                                'late' => ['text' => 'text-amber-700', 'bg' => 'bg-amber-50', 'label' => 'Terlambat'],
+                                'absent' => ['text' => 'text-rose-700', 'bg' => 'bg-rose-50', 'label' => 'Alpha']
+                            ];
+                        @endphp
+                        @foreach($statusMap as $statusCode => $style)
                             @php
-                                $styles = [
-                                    'present' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'bar' => 'bg-emerald-500', 'label' => 'Hadir'],
-                                    'absent' => ['bg' => 'bg-rose-50', 'text' => 'text-rose-700', 'bar' => 'bg-rose-500', 'label' => 'Alpha'],
-                                    'late' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-700', 'bar' => 'bg-amber-500', 'label' => 'Terlambat'],
-                                    'excused' => ['bg' => 'bg-sky-50', 'text' => 'text-sky-700', 'bar' => 'bg-sky-500', 'label' => 'Izin']
-                                ];
-                                $style = $styles[$attendance->status] ?? $styles['present'];
-                                $totalToday = $today_attendance->sum('total');
-                                $percentage = $totalToday > 0 ? ($attendance->total / $totalToday) * 100 : 0;
+                                $count = $today_attendance->where('status', $statusCode)->first()->total ?? 0;
                             @endphp
-                            <div class="{{ $style['bg'] }} p-4 rounded-2xl border border-transparent hover:shadow-md transition-all">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-bold {{ $style['text'] }} uppercase tracking-wider">{{ $style['label'] }}</span>
-                                    <span class="text-sm font-black text-gray-900">{{ $attendance->total }}</span>
-                                </div>
-                                <div class="w-full bg-white/50 rounded-full h-1.5 overflow-hidden">
-                                    <div class="{{ $style['bar'] }} h-full rounded-full" style="width: {{ $percentage }}%"></div>
-                                </div>
+                            <div class="{{ $style['bg'] }} px-4 py-2.5 rounded-xl border border-transparent flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full {{ str_replace('text', 'bg', $style['text']) }}"></span>
+                                <span class="text-[11px] font-bold {{ $style['text'] }} uppercase tracking-wider">{{ $style['label'] }}</span>
+                                <span class="text-sm font-black text-gray-900 ml-1">{{ $count }}</span>
                             </div>
                         @endforeach
                     </div>
                 @else
-                    <div class="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                        <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <p class="text-gray-500 text-sm font-medium">Belum ada data presensi hari ini</p>
-                    </div>
+                    <p class="text-gray-400 text-center py-6 italic text-sm">Belum ada data presensi hari ini</p>
                 @endif
             </div>
         </div>
@@ -433,29 +341,28 @@
                     const attendanceContainer = document.getElementById('today-attendance-container');
                     if (attendanceContainer) {
                         if (data.today_attendance && data.today_attendance.length > 0) {
-                            const totalToday = data.today_attendance.reduce((sum, item) => sum + parseInt(item.total), 0);
-                            
                             const styles = {
                                 'present': { bg: 'bg-emerald-50', text: 'text-emerald-700', bar: 'bg-emerald-500', label: 'Hadir' },
-                                'absent': { bg: 'bg-rose-50', text: 'text-rose-700', bar: 'bg-rose-500', label: 'Alpha' },
+                                'sick': { bg: 'bg-orange-50', text: 'text-orange-700', bar: 'bg-orange-500', label: 'Sakit' },
+                                'excused': { bg: 'bg-sky-50', text: 'text-sky-700', bar: 'bg-sky-500', label: 'Izin' },
                                 'late': { bg: 'bg-amber-50', text: 'text-amber-700', bar: 'bg-amber-500', label: 'Terlambat' },
-                                'excused': { bg: 'bg-sky-50', text: 'text-sky-700', bar: 'bg-sky-500', label: 'Izin' }
+                                'absent': { bg: 'bg-rose-50', text: 'text-rose-700', bar: 'bg-rose-500', label: 'Alpha' }
                             };
 
-                            let cardsHtml = '<div class="grid grid-cols-2 gap-4">';
-                            data.today_attendance.forEach(attendance => {
-                                const style = styles[attendance.status] || styles['present'];
-                                const percentage = totalToday > 0 ? (attendance.total / totalToday) * 100 : 0;
+                            const statusOrder = ['present', 'sick', 'excused', 'late', 'absent'];
+                            let cardsHtml = '<div class="flex flex-wrap gap-2">';
+                            
+                            statusOrder.forEach(status => {
+                                const style = styles[status];
+                                const bgDot = style.text.replace('text', 'bg');
+                                const attData = data.today_attendance.find(a => a.status === status);
+                                const total = attData ? attData.total : 0;
                                 
                                 cardsHtml += `
-                                    <div class="${style.bg} p-4 rounded-2xl border border-transparent hover:shadow-md transition-all">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <span class="text-xs font-bold ${style.text} uppercase tracking-wider">${style.label}</span>
-                                            <span class="text-sm font-black text-gray-900">${attendance.total}</span>
-                                        </div>
-                                        <div class="w-full bg-white/50 rounded-full h-1.5 overflow-hidden">
-                                            <div class="${style.bar} h-full rounded-full" style="width: ${percentage}%"></div>
-                                        </div>
+                                    <div class="${style.bg} px-4 py-2.5 rounded-xl border border-transparent flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full ${bgDot}"></span>
+                                        <span class="text-[11px] font-bold ${style.text} uppercase tracking-wider">${style.label}</span>
+                                        <span class="text-sm font-black text-gray-900 ml-1">${total}</span>
                                     </div>
                                 `;
                             });

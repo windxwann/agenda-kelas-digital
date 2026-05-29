@@ -154,7 +154,64 @@
                 @endforelse
             </div>
         </div>
+
+        <!-- Academic Years Results -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-5 border-b border-gray-50">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-red-50 text-red-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-gray-800">Tahun Akademik ({{ $resultAcademicYears->count() }})</h3>
+                </div>
+            </div>
+            <div class="divide-y divide-gray-50">
+                @forelse($resultAcademicYears as $ay)
+                <a href="{{ route('admin.academic_years.index') }}" class="flex items-center p-4 hover:bg-gray-50 transition-all group">
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-bold text-gray-900 truncate">{{ $ay->name }}</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-300 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+                @empty
+                <div class="p-8 text-center text-gray-500 text-sm italic">Tidak ada tahun akademik ditemukan</div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Rooms Results -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-5 border-b border-gray-50">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-orange-50 text-orange-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-gray-800">Ruangan ({{ $resultRooms->count() }})</h3>
+                </div>
+            </div>
+            <div class="divide-y divide-gray-50">
+                @forelse($resultRooms as $room)
+                <a href="{{ route('admin.rooms.index') }}" class="flex items-center p-4 hover:bg-gray-50 transition-all group">
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-bold text-gray-900 truncate">{{ $room->name }}</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-300 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+                @empty
+                <div class="p-8 text-center text-gray-500 text-sm italic">Tidak ada ruangan ditemukan</div>
+                @endforelse
+            </div>
+        </div>
     </div>
+
 
     <!-- Agenda Results -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

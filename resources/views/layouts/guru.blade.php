@@ -54,7 +54,7 @@
                 </div>
 
                 <!-- Navigation -->
-                <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+                <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-hide">
                     <a href="{{ route('guru.dashboard') }}" 
                        class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('guru.dashboard') ? 'bg-blue-50 text-blue-600' : '' }}">
                         <svg class="w-5 h-5 {{ request()->routeIs('guru.dashboard') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">

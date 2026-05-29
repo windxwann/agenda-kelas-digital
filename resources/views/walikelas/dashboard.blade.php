@@ -44,7 +44,7 @@
 
     @if($has_class)
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 group hover:border-indigo-500 transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
@@ -63,7 +63,7 @@
         <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 group hover:border-emerald-500 transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hadir Hari Ini</p>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hadir</p>
                     <p class="text-3xl font-black text-emerald-600 mt-1">{{ $today_attendance->get('present')?->count() ?? 0 }}</p>
                 </div>
                 <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform duration-300">
@@ -71,31 +71,44 @@
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-gray-50 flex items-center text-xs text-gray-500">
-                <span class="font-bold text-emerald-600">Terdaftar</span>
-                <span class="mx-2">•</span>
-                {{ $total_students }} Siswa
+                <span class="font-bold text-emerald-600">Presensi Hari Ini</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 group hover:border-orange-500 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sakit</p>
+                    <p class="text-3xl font-black text-orange-600 mt-1">{{ $today_attendance->get('sick')?->count() ?? 0 }}</p>
+                </div>
+                <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-50 flex items-center text-xs text-gray-500">
+                Data sakit hari ini
             </div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 group hover:border-blue-500 transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Izin / Sakit</p>
-                    <p class="text-3xl font-black text-blue-600 mt-1">{{ ($today_attendance->get('excused')?->count() ?? 0) + ($today_attendance->get('sick')?->count() ?? 0) }}</p>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Izin</p>
+                    <p class="text-3xl font-black text-blue-600 mt-1">{{ $today_attendance->get('excused')?->count() ?? 0 }}</p>
                 </div>
                 <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-gray-50 flex items-center text-xs text-gray-500">
-                Data kehadiran hari ini
+                Data izin hari ini
             </div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 group hover:border-rose-500 transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tanpa Ket. (Alpha)</p>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alpha</p>
                     <p class="text-3xl font-black text-rose-600 mt-1">{{ $today_attendance->get('absent')?->count() ?? 0 }}</p>
                 </div>
                 <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 group-hover:scale-110 transition-transform duration-300">

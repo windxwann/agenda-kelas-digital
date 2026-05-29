@@ -60,8 +60,9 @@ class StudentsImport implements ToCollection
         
         // Try to replace starting digits (e.g. "11 RPL 1" -> "XI RPL 1")
         foreach ($romanMap as $num => $roman) {
-            if (strpos($className, $num . ' ') === 0) {
-                $convertedName = preg_replace('/^' . $num . '\s+/', $roman . ' ', $className);
+            // Updated regex to handle "11 RPL 1" correctly to "XI RPL 1"
+            if (preg_match('/^' . $num . '\s+/i', $className)) {
+                $convertedName = preg_replace('/^' . $num . '\s+/i', $roman . ' ', $className);
                 $class = Classes::where('name', $convertedName)->where('is_active', true)->first() 
                       ?? Classes::where('name', $convertedName)->first();
                 if ($class) {
@@ -71,7 +72,7 @@ class StudentsImport implements ToCollection
             
             // Try replacing without spaces
             if (strpos($className, $num) === 0) {
-                $convertedName = preg_replace('/^' . $num . '/', $roman, $className);
+                $convertedName = preg_replace('/^' . $num . '/i', $roman, $className);
                 $class = Classes::where('name', $convertedName)->where('is_active', true)->first() 
                       ?? Classes::where('name', $convertedName)->first();
                 if ($class) {
@@ -315,6 +316,11 @@ class StudentsImport implements ToCollection
             }
 
             $emailVal = !empty($email) ? trim($email) : ($nis . '@agenda.local');
+            
+            // Perbaiki: Pastikan email unik jika sudah ada di database
+            if (User::where('email', $emailVal)->exists()) {
+                $emailVal = $nis . '_' . time() . '@agenda.local';
+            }
 
             // Parse tanggal lahir secara fleksibel
             $tanggal_lahir = null;
@@ -353,22 +359,32 @@ class StudentsImport implements ToCollection
 
             // Tentukan ID kelas (Memprioritaskan Kelas Tujuan dari dropdown jika dipilih)
             $targetClassId = null;
+            $classFromExcel = null;
+
+            if (!empty($kelasName)) {
+                $classFromExcel = $this->getMatchingClass($kelasName);
+            }
+
             if (!empty($this->classId)) {
-                $targetClassId = $this->classId;
-            } elseif (!empty($kelasName)) {
-                $className = trim($kelasName);
-                
-                // Cari kelas berdasarkan nama dengan pencocokan cerdas (Romawi & Angka)
-                $class = $this->getMatchingClass($className);
-                if ($class) {
-                    $targetClassId = $class->id;
-                } else {
-                    // Kelas terisi di Excel tetapi TIDAK ditemukan di database: skip siswa ini agar tidak salah masuk kelas
+                // Dropdown is selected.
+                // 1. If Excel has class info, it MUST match the dropdown class.
+                if ($classFromExcel && $classFromExcel->id != $this->classId) {
                     $this->skippedCount++;
                     continue;
                 }
+                
+                // 2. If Excel does NOT have class info, we skip to be safe to avoid importing into wrong class.
+                if (!$classFromExcel) {
+                    $this->skippedCount++;
+                    continue;
+                }
+                
+                $targetClassId = $this->classId;
+            } elseif ($classFromExcel) {
+                // Dropdown not selected, use Excel class
+                $targetClassId = $classFromExcel->id;
             } else {
-                // Jika tidak ada kelas di excel dan tidak ada di dropdown, skip
+                // Neither dropdown nor excel class found
                 $this->skippedCount++;
                 continue;
             }

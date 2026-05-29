@@ -222,7 +222,7 @@
             </header>
 
             {{-- Content Area --}}
-            <main class="flex-1 overflow-y-auto">
+            <main class="flex-1 overflow-y-auto scrollbar-hide">
                 <div class="px-4 sm:px-6 lg:px-8 py-8">
                     @if(session('success'))
                         <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">

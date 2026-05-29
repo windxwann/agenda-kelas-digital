@@ -7,6 +7,7 @@ use App\Models\Agenda;
 use App\Models\Classes;
 use App\Models\Subject;
 use App\Models\Schedule;
+use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -21,7 +22,9 @@ class AgendaController extends Controller
             ->latest()
             ->paginate(10);
             
-        return view('guru.agenda.index', compact('agendas'));
+        $academicYears = AcademicYear::orderBy('name', 'desc')->get();
+            
+        return view('guru.agenda.index', compact('agendas', 'academicYears'));
     }
 
     public function create(Request $request)
@@ -33,12 +36,14 @@ class AgendaController extends Controller
             ->with(['class', 'subject'])
             ->get();
             
-        $classes = $schedules->pluck('class')->unique('id');
-        $subjects = $schedules->pluck('subject')->unique('id');
+        $classes = $schedules->pluck('class')->unique('id')->values();
+        $subjects = $schedules->pluck('subject')->unique('id')->values();
         
         $selected_schedule = null;
         if ($request->has('schedule_id')) {
-            $selected_schedule = Schedule::with(['class', 'subject'])->find($request->schedule_id);
+            $selected_schedule = Schedule::where('teacher_id', $teacher->id)
+                ->with(['class', 'subject'])
+                ->find($request->schedule_id);
         }
 
         // Default rooms from today's schedule for this teacher

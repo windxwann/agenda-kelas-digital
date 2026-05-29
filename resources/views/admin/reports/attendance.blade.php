@@ -32,7 +32,16 @@
             <div class="w-2 h-6 bg-blue-600 rounded-full mr-3"></div>
             <h3 class="text-lg font-bold text-gray-900">Filter Pencarian</h3>
         </div>
-        <form method="GET" action="{{ route('admin.reports.attendance') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <form method="GET" action="{{ route('admin.reports.attendance') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Tahun Ajaran</label>
+                <select name="academic_year_id" class="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-medium">
+                    <option value="">Tahun Ajaran (Aktif)</option>
+                    @foreach($academicYears as $year)
+                        <option value="{{ $year->id }}" {{ request('academic_year_id') == $year->id ? 'selected' : '' }}>{{ $year->name }} {{ $year->is_active ? '(Aktif)' : '' }}</option>
+                    @endforeach
+                </select>
+            </div>
             <div class="space-y-2">
                 <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Pilih Kelas</label>
                 <select name="class_id" class="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-medium">
@@ -52,7 +61,7 @@
                 <input type="date" name="end_date" value="{{ request('end_date') }}" 
                        class="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-medium">
             </div>
-            <div class="lg:col-span-3 flex justify-end pt-4">
+            <div class="lg:col-span-4 flex justify-end pt-2">
                 <button type="submit" class="w-full md:w-auto px-10 py-3.5 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 flex items-center justify-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     Tampilkan Laporan
@@ -131,8 +140,12 @@
                             </div>
                         </td>
                         <td class="px-8 py-4 whitespace-nowrap">
+                            @php
+                                $historicalClass = $student->classHistories->first();
+                                $displayClass = $historicalClass ? $historicalClass->class : $student->class;
+                            @endphp
                             <span class="px-3 py-1 text-[10px] font-bold bg-blue-50 text-blue-700 rounded-lg border border-blue-100 uppercase tracking-wider">
-                                {{ $student->class->name ?? '-' }}
+                                {{ $displayClass->name ?? '-' }}
                             </span>
                         </td>
                         <td class="px-8 py-4 text-center text-sm font-bold text-emerald-600">{{ $student->attendances->where('status', 'present')->count() }}</td>

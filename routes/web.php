@@ -88,6 +88,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Manajemen Kelas
     Route::resource('classes', ClassController::class);
     
+    // Manajemen Tahun Ajaran
+    Route::resource('academic-years', \App\Http\Controllers\Admin\AcademicYearController::class)->except(['create', 'show', 'edit']);
+    Route::post('academic-years/{academic_year}/set-active', [\App\Http\Controllers\Admin\AcademicYearController::class, 'setActive'])->name('academic-years.set-active');
+    
+    // Kenaikan Kelas
+    Route::get('class-promotions', [\App\Http\Controllers\Admin\ClassPromotionController::class, 'index'])->name('class-promotions.index');
+    Route::get('class-promotions/preview', [\App\Http\Controllers\Admin\ClassPromotionController::class, 'preview'])->name('class-promotions.preview');
+    Route::post('class-promotions/promote', [\App\Http\Controllers\Admin\ClassPromotionController::class, 'promote'])->name('class-promotions.promote');
+    
     // Manajemen Siswa
     Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
     Route::get('students/export/template', [StudentController::class, 'exportTemplate'])->name('students.export.template');
@@ -145,6 +154,8 @@ Route::middleware(['auth', 'role:sekretaris'])->prefix('sekretaris')->name('sekr
     // Agenda Kelas
     Route::get('/agenda/get-schedule-info', [App\Http\Controllers\Sekretaris\AgendaController::class, 'getScheduleInfo'])->name('agenda.get-schedule-info');
     Route::get('/agenda', [App\Http\Controllers\Sekretaris\AgendaController::class, 'index'])->name('agenda.index');
+    // Arsip Agenda
+    Route::get('/agenda/archive', [App\Http\Controllers\Sekretaris\ArchiveController::class, 'index'])->name('agenda.archive');
     Route::get('/agenda/create', [App\Http\Controllers\Sekretaris\AgendaController::class, 'create'])->name('agenda.create');
     Route::post('/agenda', [App\Http\Controllers\Sekretaris\AgendaController::class, 'store'])->name('agenda.store');
     Route::get('/agenda/{agenda}/edit', [App\Http\Controllers\Sekretaris\AgendaController::class, 'edit'])->name('agenda.edit');

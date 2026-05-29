@@ -15,6 +15,26 @@
                     Monitoring jurnal mengajar guru secara harian.
                 </p>
             </div>
+            @if($has_class)
+            <div>
+                <form method="GET" action="{{ route('wali-kelas.agenda.index') }}" class="flex items-center gap-2">
+                    <select name="academic_year_id" onchange="this.form.submit()" 
+                            class="block w-48 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-xs font-semibold">
+                        <option value="">Tahun Ajaran (Aktif)</option>
+                        @foreach($academicYears as $year)
+                            <option value="{{ $year->id }}" {{ request('academic_year_id') == $year->id ? 'selected' : '' }}>
+                                {{ $year->name }} {{ $year->is_active ? '(Aktif)' : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if(request('academic_year_id'))
+                        <a href="{{ route('wali-kelas.agenda.index') }}" class="p-1.5 text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Reset">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </a>
+                    @endif
+                </form>
+            </div>
+            @endif
         </div>
     </div>
 

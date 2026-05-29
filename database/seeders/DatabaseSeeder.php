@@ -225,6 +225,8 @@ class DatabaseSeeder extends Seeder
             );
         }
 
+        $this->call(AcademicYearSeeder::class);
+
         $this->command->info('Database seeded successfully!');
         $this->command->info('Login credentials:');
         $this->command->info('Super Admin: superadmin@school.com / password');

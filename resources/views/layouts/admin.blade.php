@@ -57,89 +57,78 @@
                 @php
                     $routePrefix = Auth::user()->hasRole('super_admin') ? 'super-admin.' : 'admin.';
                 @endphp
-                <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-                    <a href="{{ route($routePrefix . 'dashboard') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'dashboard') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Dashboard</span>
-                        @if(request()->routeIs($routePrefix . 'dashboard'))
-                            <span class="ml-auto w-1.5 h-8 bg-blue-600 rounded-full"></span>
-                        @endif
-                    </a>
+                <nav class="flex-1 px-4 py-6 space-y-6 overflow-y-auto scrollbar-hide">
                     
-                    <a href="{{ route($routePrefix . 'classes.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'classes.*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Kelas</span>
-                    </a>
-                    
-                    <a href="{{ route($routePrefix . 'students.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'students.index') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Data Siswa</span>
-                    </a>
+                    <!-- Section: Utama -->
+                    <div>
+                        <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Utama</p>
+                        <a href="{{ route($routePrefix . 'dashboard') }}" 
+                           class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs($routePrefix . 'dashboard') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                            <span class="ml-3 font-medium">Dashboard</span>
+                        </a>
+                    </div>
 
-                    <a href="{{ route($routePrefix . 'students.bulk-graduation') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'students.bulk-graduation') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Kelulusan Massal</span>
-                    </a>
-                    
-                    <a href="{{ route($routePrefix . 'teachers.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'teachers.*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Guru</span>
-                    </a>
-                    
-                    <a href="{{ route($routePrefix . 'subjects.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'subjects.*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Mata Pelajaran</span>
-                    </a>
-                    
-                    <a href="{{ route($routePrefix . 'schedules.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'schedules.*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Jadwal</span>
-                    </a>
-                    
-                    <a href="{{ route($routePrefix . 'rooms.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'rooms.*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Manajemen Ruangan</span>
-                    </a>
-                    
-                    <a href="{{ route('admin.monitoring.rooms') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('admin.monitoring.rooms') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Monitoring Ruangan</span>
-                    </a>
-                    
-                    <a href="{{ route($routePrefix . 'reports.attendance') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs($routePrefix . 'reports.*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Laporan</span>
-                    </a>
+                    <!-- Section: Data Master -->
+                    <div>
+                        <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Data Master</p>
+                        <a href="{{ route($routePrefix . 'classes.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs($routePrefix . 'classes.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            <span class="ml-3 font-medium">Kelas</span>
+                        </a>
+                        <a href="{{ route($routePrefix . 'students.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs($routePrefix . 'students.index') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            <span class="ml-3 font-medium">Data Siswa</span>
+                        </a>
+                        <a href="{{ route($routePrefix . 'teachers.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs($routePrefix . 'teachers.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <span class="ml-3 font-medium">Guru</span>
+                        </a>
+                        <a href="{{ route($routePrefix . 'subjects.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs($routePrefix . 'subjects.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            <span class="ml-3 font-medium">Mata Pelajaran</span>
+                        </a>
+                        <a href="{{ route($routePrefix . 'rooms.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs($routePrefix . 'rooms.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            <span class="ml-3 font-medium">Ruangan</span>
+                        </a>
+                    </div>
+
+                    <!-- Section: Akademik & Operasional -->
+                    <div>
+                        <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Akademik</p>
+                        <a href="{{ route($routePrefix . 'schedules.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs($routePrefix . 'schedules.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span class="ml-3 font-medium">Jadwal</span>
+                        </a>
+                        @if(Auth::user()->hasRole('admin'))
+                        <a href="{{ route('admin.academic-years.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs('admin.academic-years.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span class="ml-3 font-medium">Tahun Ajaran</span>
+                        </a>
+                        <a href="{{ route('admin.class-promotions.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs('admin.class-promotions.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                            <span class="ml-3 font-medium">Kenaikan Kelas</span>
+                        </a>
+                        @endif
+                        <a href="{{ route($routePrefix . 'students.bulk-graduation') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs($routePrefix . 'students.bulk-graduation') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            <span class="ml-3 font-medium">Kelulusan</span>
+                        </a>
+                    </div>
+
+                    <!-- Section: Laporan -->
+                    <div>
+                        <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Laporan</p>
+                        <a href="{{ route('admin.monitoring.rooms') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs('admin.monitoring.rooms') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span class="ml-3 font-medium">Monitoring Ruangan</span>
+                        </a>
+                        <a href="{{ route($routePrefix . 'reports.attendance') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all {{ request()->routeIs($routePrefix . 'reports.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span class="ml-3 font-medium">Absensi</span>
+                        </a>
+                    </div>
                 </nav>
                 
                 <!-- User Menu -->
@@ -247,7 +236,7 @@
             </header>
             
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto bg-gray-50">
+            <main class="flex-1 overflow-y-auto bg-gray-50 scrollbar-hide">
                 <div class="px-4 sm:px-6 lg:px-8 py-8">
                     @if(session('success'))
                         <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">

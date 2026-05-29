@@ -189,29 +189,51 @@
             </div>
             
             @if($todayAttendance && $todayAttendance->count() > 0)
-                <div class="grid grid-cols-2 gap-4">
-                    @foreach($todayAttendance as $attendance)
-                        @php
-                            $styles = [
-                                'present' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'bar' => 'bg-emerald-500', 'label' => 'Hadir'],
-                                'absent' => ['bg' => 'bg-rose-50', 'text' => 'text-rose-700', 'bar' => 'bg-rose-500', 'label' => 'Alpha'],
-                                'late' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-700', 'bar' => 'bg-amber-500', 'label' => 'Terlambat'],
-                                'excused' => ['bg' => 'bg-sky-50', 'text' => 'text-sky-700', 'bar' => 'bg-sky-500', 'label' => 'Izin']
-                            ];
-                            $style = $styles[$attendance->status] ?? $styles['present'];
-                            $totalToday = $todayAttendance->sum('total');
-                            $percentage = $totalToday > 0 ? ($attendance->total / $totalToday) * 100 : 0;
-                        @endphp
-                        <div class="{{ $style['bg'] }} p-4 rounded-2xl border border-transparent hover:shadow-md transition-all">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold {{ $style['text'] }} uppercase tracking-wider">{{ $style['label'] }}</span>
-                                <span class="text-sm font-black text-gray-900">{{ $attendance->total }}</span>
-                            </div>
-                            <div class="w-full bg-white/50 rounded-full h-1.5 overflow-hidden">
-                                <div class="{{ $style['bar'] }} h-full rounded-full" style="width: {{ $percentage }}%"></div>
-                            </div>
+                <div class="space-y-4">
+                    {{-- Progress Overview --}}
+                    @php
+                        $totalPresent = ($todayAttendance->where('status', 'present')->first()->total ?? 0) + ($todayAttendance->where('status', 'late')->first()->total ?? 0);
+                        $totalToday = $todayAttendance->sum('total');
+                        $mainPercentage = $totalStudents > 0 ? round(($totalPresent / $totalStudents) * 100) : 0;
+                    @endphp
+                    <div class="bg-gray-50 rounded-2xl p-4 flex items-center justify-between border border-gray-100/50">
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Tingkat Kehadiran</p>
+                            <p class="text-xl font-black text-gray-900 mt-0.5">{{ $mainPercentage }}% <span class="text-xs font-bold text-gray-400 ml-1">Siswa Hadir</span></p>
                         </div>
-                    @endforeach
+                        <div class="text-right">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Data</p>
+                            <p class="text-xl font-black text-blue-600 mt-0.5">{{ $totalToday }}<span class="text-xs font-bold text-gray-400 ml-1">/ {{ $totalStudents }}</span></p>
+                        </div>
+                    </div>
+
+                    {{-- Status Grid --}}
+                    <div class="grid grid-cols-2 gap-4">
+                        @php
+                            $statusMap = [
+                                'present' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'bar' => 'bg-emerald-500', 'label' => 'Hadir'],
+                                'sick' => ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'bar' => 'bg-orange-500', 'label' => 'Sakit'],
+                                'excused' => ['bg' => 'bg-sky-50', 'text' => 'text-sky-700', 'bar' => 'bg-sky-500', 'label' => 'Izin'],
+                                'late' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-700', 'bar' => 'bg-amber-500', 'label' => 'Telat'],
+                                'absent' => ['bg' => 'bg-rose-50', 'text' => 'text-rose-700', 'bar' => 'bg-rose-500', 'label' => 'Alpha']
+                            ];
+                        @endphp
+                        @foreach($statusMap as $statusCode => $style)
+                            @php
+                                $count = $todayAttendance->where('status', $statusCode)->first()->total ?? 0;
+                                $percentage = $totalToday > 0 ? ($count / $totalToday) * 100 : 0;
+                            @endphp
+                            <div class="{{ $style['bg'] }} p-4 rounded-2xl border border-transparent hover:shadow-md transition-all {{ $loop->last && $loop->iteration % 2 != 0 ? 'col-span-2' : '' }}">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[10px] font-black {{ $style['text'] }} uppercase tracking-wider">{{ $style['label'] }}</span>
+                                    <span class="text-lg font-black text-gray-900">{{ $count }}</span>
+                                </div>
+                                <div class="w-full bg-white/50 rounded-full h-1.5 overflow-hidden">
+                                    <div class="{{ $style['bar'] }} h-full rounded-full" style="width: {{ $percentage }}%"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             @else
                 <div class="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">

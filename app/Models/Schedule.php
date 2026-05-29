@@ -5,13 +5,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasAcademicYear;
 
 class Schedule extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAcademicYear;
     
     protected $fillable = [
-        'class_id', 'subject_id', 'teacher_id', 'day', 'start_time', 'end_time', 'room'
+        'class_id', 'subject_id', 'teacher_id', 'day', 'start_time', 'end_time', 'room', 'room_id', 'academic_year_id'
     ];
     
     public function class()

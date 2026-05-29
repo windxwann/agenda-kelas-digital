@@ -59,11 +59,24 @@
 
     <!-- Modern List Section -->
     <div class="space-y-4">
-        <div class="flex items-center justify-between px-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between px-4 gap-4">
             <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Daftar Aktivitas Terbaru</h3>
-            <div class="flex items-center gap-2">
-                <button class="p-2 text-gray-400 hover:text-blue-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg></button>
-            </div>
+            <form method="GET" action="{{ route('guru.agenda.index') }}" class="flex items-center gap-2">
+                <select name="academic_year_id" onchange="this.form.submit()" 
+                        class="block w-48 px-3 py-1.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-xs font-semibold">
+                    <option value="">Tahun Ajaran (Aktif)</option>
+                    @foreach($academicYears as $year)
+                        <option value="{{ $year->id }}" {{ request('academic_year_id') == $year->id ? 'selected' : '' }}>
+                            {{ $year->name }} {{ $year->is_active ? '(Aktif)' : '' }}
+                        </option>
+                    @endforeach
+                </select>
+                @if(request('academic_year_id'))
+                    <a href="{{ route('guru.agenda.index') }}" class="p-1.5 text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Reset">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </a>
+                @endif
+            </form>
         </div>
 
         <div class="grid grid-cols-1 gap-4">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\WaliKelas;
 use App\Http\Controllers\Controller;
 use App\Models\Agenda;
 use App\Models\Classes;
+use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,10 +26,13 @@ class AgendaController extends Controller
             ->orderBy('start_time', 'desc')
             ->paginate(15);
             
+        $academicYears = AcademicYear::orderBy('name', 'desc')->get();
+            
         return view('walikelas.agenda.index', [
             'has_class' => true,
             'class' => $class,
-            'agendas' => $agendas
+            'agendas' => $agendas,
+            'academicYears' => $academicYears
         ]);
     }
 

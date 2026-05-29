@@ -42,7 +42,7 @@ class AttendanceController extends Controller
         }
 
         return view('guru.attendance.index', compact('classes', 'students', 'selectedClassId', 'months'));
-    }
+        }
     
     public function store(Request $request)
     {

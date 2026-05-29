@@ -37,7 +37,7 @@
     </div>
 
     {{-- Stats Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:border-gray-200 transition-all">
             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total</p>
             <p class="text-2xl font-black text-gray-900">{{ $attendance_stats['total'] }}</p>
@@ -56,6 +56,11 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:border-sky-200 transition-all">
             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Izin / Sakit</p>
             <p class="text-2xl font-black text-sky-600">{{ ($attendance_stats['excused'] ?? 0) + ($attendance_stats['sick'] ?? 0) }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:border-rose-200 transition-all">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Alpha</p>
+            <p class="text-2xl font-black text-rose-600">{{ $attendance_stats['absent'] ?? 0 }}</p>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:border-purple-200 transition-all">
@@ -211,7 +216,7 @@
                     borderRadius: 4
                 }
             },
-            colors: ['#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#6B7280'], // Hijau, Oranye, Merah, Biru, Abu-abu
+            colors: ['#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#F97316'], // Hijau, Oranye, Merah, Biru, Oranye Cerah
             xaxis: {
                 categories: monthlyData.map(item => item.month),
                 labels: { style: { colors: '#94a3b8', fontSize: '11px' } }

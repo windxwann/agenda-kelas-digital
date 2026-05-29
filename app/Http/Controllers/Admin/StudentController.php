@@ -9,6 +9,7 @@ use App\Models\Classes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\StudentsImport;
 use App\Exports\StudentsTemplateExport;
@@ -228,11 +229,16 @@ class StudentController extends Controller
         ]);
 
         try {
-            $import = new StudentsImport($request->class_id);
-            Excel::import($import, $request->file('file'));
-            
-            $importedCount = $import->getImportedCount();
-            $skippedCount = $import->getSkippedCount();
+            $importedCount = 0;
+            $skippedCount = 0;
+
+            DB::transaction(function () use ($request, &$importedCount, &$skippedCount) {
+                $import = new StudentsImport($request->class_id);
+                Excel::import($import, $request->file('file'));
+                
+                $importedCount = $import->getImportedCount();
+                $skippedCount = $import->getSkippedCount();
+            });
             
             $message = "Data siswa berhasil diimport! Berhasil menyimpan {$importedCount} siswa.";
             if ($skippedCount > 0) {

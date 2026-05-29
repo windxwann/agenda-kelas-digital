@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Siswa;
 use App\Http\Controllers\Controller;
 use App\Models\Agenda;
 use App\Models\Subject;
+use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -50,7 +51,8 @@ class AgendaController extends Controller
             $groupedAgendas[$dateKey]->push($agenda);
         }
 
-        return view('siswa.agenda.index', compact('agendas', 'subjects', 'groupedAgendas', 'todayStr', 'yesterdayStr'));
+        $academicYears = AcademicYear::orderBy('name', 'desc')->get();
+        return view('siswa.agenda.index', compact('agendas', 'subjects', 'groupedAgendas', 'todayStr', 'yesterdayStr', 'academicYears'));
     }
 
     public function showJson($id)

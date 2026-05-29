@@ -57,6 +57,7 @@ class ScheduleController extends Controller
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
+            'room' => 'nullable|string|max:255',
             'room_id' => 'nullable|exists:rooms,id'
         ]);
 
@@ -85,18 +86,49 @@ class ScheduleController extends Controller
             return redirect()->back()->with('error', 'Guru yang bersangkutan sudah memiliki jadwal mengajar di jam yang sama!')->withInput();
         }
 
-        // 3. Cek bentrok ruangan
+        // 3. Cek bentrok ruangan (hybrid check)
+        $roomId = null;
+        $roomName = null;
+
         if ($request->filled('room_id')) {
-            if (Schedule::where('room_id', $request->room_id)
-                ->where('day', $request->day)
+            $roomId = $request->room_id;
+            $roomObj = Room::find($roomId);
+            if ($roomObj) {
+                $roomName = $roomObj->name;
+            }
+        } elseif ($request->filled('room')) {
+            $roomName = $request->room;
+            $roomObj = Room::where('name', $roomName)->first();
+            if ($roomObj) {
+                $roomId = $roomObj->id;
+            }
+        }
+
+        if ($roomId || $roomName) {
+            $roomConflict = Schedule::where('day', $request->day)
                 ->where(function($q) use ($startTime, $endTime) {
                     $q->where('start_time', '<', $endTime)->where('end_time', '>', $startTime);
-                })->exists()) {
+                })
+                ->where(function($q) use ($roomId, $roomName) {
+                    if ($roomId) {
+                        $q->where('room_id', $roomId);
+                    }
+                    if ($roomName) {
+                        $q->orWhere('room', $roomName);
+                    }
+                })
+                ->exists();
+
+            if ($roomConflict) {
                 return redirect()->back()->with('error', 'Ruangan sudah digunakan untuk jadwal lain pada jam yang sama!')->withInput();
             }
         }
 
-        Schedule::create($request->all());
+        $data = $request->all();
+        $data['room'] = $roomName;
+        $data['room_id'] = $roomId;
+
+        Schedule::create($data);
 
         $prefix = $request->segment(1);
         return redirect()->route($prefix . '.schedules.index')->with('success', 'Jadwal berhasil ditambahkan!');
@@ -122,6 +154,7 @@ class ScheduleController extends Controller
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
+            'room' => 'nullable|string|max:255',
             'room_id' => 'nullable|exists:rooms,id'
         ]);
 
@@ -152,19 +185,50 @@ class ScheduleController extends Controller
             return redirect()->back()->with('error', 'Guru yang bersangkutan sudah memiliki jadwal mengajar di jam yang sama!')->withInput();
         }
 
-        // 3. Cek bentrok ruangan
+        // 3. Cek bentrok ruangan (hybrid check)
+        $roomId = null;
+        $roomName = null;
+
         if ($request->filled('room_id')) {
-            if (Schedule::where('room_id', $request->room_id)
-                ->where('id', '!=', $schedule->id)
+            $roomId = $request->room_id;
+            $roomObj = Room::find($roomId);
+            if ($roomObj) {
+                $roomName = $roomObj->name;
+            }
+        } elseif ($request->filled('room')) {
+            $roomName = $request->room;
+            $roomObj = Room::where('name', $roomName)->first();
+            if ($roomObj) {
+                $roomId = $roomObj->id;
+            }
+        }
+
+        if ($roomId || $roomName) {
+            $roomConflict = Schedule::where('id', '!=', $schedule->id)
                 ->where('day', $request->day)
                 ->where(function($q) use ($startTime, $endTime) {
                     $q->where('start_time', '<', $endTime)->where('end_time', '>', $startTime);
-                })->exists()) {
+                })
+                ->where(function($q) use ($roomId, $roomName) {
+                    if ($roomId) {
+                        $q->where('room_id', $roomId);
+                    }
+                    if ($roomName) {
+                        $q->orWhere('room', $roomName);
+                    }
+                })
+                ->exists();
+
+            if ($roomConflict) {
                 return redirect()->back()->with('error', 'Ruangan sudah digunakan untuk jadwal lain pada jam yang sama!')->withInput();
             }
         }
 
-        $schedule->update($request->all());
+        $data = $request->all();
+        $data['room'] = $roomName;
+        $data['room_id'] = $roomId;
+
+        $schedule->update($data);
 
         $prefix = $request->segment(1);
         return redirect()->route($prefix . '.schedules.index')->with('success', 'Jadwal berhasil diperbarui!');

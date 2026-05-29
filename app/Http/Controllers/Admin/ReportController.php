@@ -24,23 +24,54 @@ class ReportController extends Controller
         $classId = $request->class_id;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
+        
+        $academicYearId = $request->query('academic_year_id');
+        if (!$academicYearId) {
+            $activeYear = \App\Models\AcademicYear::where('is_active', true)->first();
+            $academicYearId = $activeYear ? $activeYear->id : null;
+        }
 
         $query = User::role('siswa');
         
         if ($classId) {
-            $query->where('class_id', $classId);
+            $query->inClassAndAcademicYear($classId, $academicYearId);
+        } else {
+            $query->where(function($q) use ($academicYearId) {
+                $q->whereHas('classHistories', function($qh) use ($academicYearId) {
+                    $qh->where('academic_year_id', $academicYearId);
+                })->orWhere(function($qo) use ($academicYearId) {
+                    $qo->whereNotNull('class_id')
+                       ->whereNotExists(function($qe) use ($academicYearId) {
+                           $qe->select(\Illuminate\Support\Facades\DB::raw(1))
+                              ->from('class_histories')
+                              ->whereColumn('class_histories.user_id', 'users.id')
+                              ->where('class_histories.academic_year_id', $academicYearId);
+                       });
+                });
+            });
         }
 
         // Ambil siswa dengan relasi presensi yang difilter
-        $students = $query->with(['class', 'attendances' => function($q) use ($startDate, $endDate) {
-            if ($startDate) $q->whereDate('date', '>=', $startDate);
-            if ($endDate) $q->whereDate('date', '<=', $endDate);
-        }])->orderBy('name', 'asc')->paginate(50);
+        $students = $query->with([
+            'class', 
+            'classHistories' => function($q) use ($academicYearId) {
+                $q->where('academic_year_id', $academicYearId)->with('class');
+            },
+            'attendances' => function($q) use ($startDate, $endDate) {
+                if ($startDate) $q->whereDate('date', '>=', $startDate);
+                if ($endDate) $q->whereDate('date', '<=', $endDate);
+            }
+        ])->orderBy('name', 'asc')->paginate(50);
 
         // Hitung total ringkasan untuk kartu (tetap menggunakan query attendance log)
         $attQuery = Attendance::query();
         if ($startDate) $attQuery->whereDate('date', '>=', $startDate);
         if ($endDate) $attQuery->whereDate('date', '<=', $endDate);
+        if ($classId) {
+            $attQuery->whereHas('student', function($q) use ($classId, $academicYearId) {
+                $q->inClassAndAcademicYear($classId, $academicYearId);
+            });
+        }
         
         $summary = [
             'total' => (clone $attQuery)->count(),
@@ -51,7 +82,9 @@ class ReportController extends Controller
             'sick' => (clone $attQuery)->where('status', 'sick')->count(),
         ];
         
-        return view('admin.reports.attendance', compact('students', 'classes', 'summary'));
+        $academicYears = \App\Models\AcademicYear::orderBy('name', 'desc')->get();
+        
+        return view('admin.reports.attendance', compact('students', 'classes', 'summary', 'academicYears'));
     }
 
     /**
@@ -76,11 +109,17 @@ class ReportController extends Controller
      */
     public function exportPDF(Request $request)
     {
+        $academicYearId = $request->query('academic_year_id');
+        if (!$academicYearId) {
+            $activeYear = \App\Models\AcademicYear::where('is_active', true)->first();
+            $academicYearId = $activeYear ? $activeYear->id : null;
+        }
+
         $query = Attendance::with(['student', 'student.class']);
         
         if ($request->has('class_id') && $request->class_id) {
-            $query->whereHas('student', function($q) use ($request) {
-                $q->where('class_id', $request->class_id);
+            $query->whereHas('student', function($q) use ($request, $academicYearId) {
+                $q->inClassAndAcademicYear($request->class_id, $academicYearId);
             });
         }
         
@@ -108,17 +147,43 @@ class ReportController extends Controller
         $startDate = $request->start_date;
         $endDate = $request->end_date;
 
-        $studentsQuery = User::role('siswa');
-        if ($classId) {
-            $studentsQuery->where('class_id', $classId);
+        $academicYearId = $request->query('academic_year_id');
+        if (!$academicYearId) {
+            $activeYear = \App\Models\AcademicYear::where('is_active', true)->first();
+            $academicYearId = $activeYear ? $activeYear->id : null;
         }
 
-        $students = $studentsQuery->with(['attendances' => function($q) use ($startDate, $endDate) {
+        $studentsQuery = User::role('siswa');
+        if ($classId) {
+            $studentsQuery->inClassAndAcademicYear($classId, $academicYearId);
+        } else {
+            $studentsQuery->where(function($q) use ($academicYearId) {
+                $q->whereHas('classHistories', function($qh) use ($academicYearId) {
+                    $qh->where('academic_year_id', $academicYearId);
+                })->orWhere(function($qo) use ($academicYearId) {
+                    $qo->whereNotNull('class_id')
+                       ->whereNotExists(function($qe) use ($academicYearId) {
+                           $qe->select(\Illuminate\Support\Facades\DB::raw(1))
+                              ->from('class_histories')
+                              ->whereColumn('class_histories.user_id', 'users.id')
+                              ->where('class_histories.academic_year_id', $academicYearId);
+                       });
+                });
+            });
+        }
+
+        $students = $studentsQuery->with([
+            'class',
+            'classHistories' => function($q) use ($academicYearId) {
+                $q->where('academic_year_id', $academicYearId)->with('class');
+            },
+            'attendances' => function($q) use ($startDate, $endDate) {
                 if ($startDate) $q->whereDate('date', '>=', $startDate);
                 if ($endDate) $q->whereDate('date', '<=', $endDate);
-            }])
-            ->orderBy('name', 'asc')
-            ->get();
+            }
+        ])
+        ->orderBy('name', 'asc')
+        ->get();
 
         $reportData = [];
         foreach ($students as $student) {

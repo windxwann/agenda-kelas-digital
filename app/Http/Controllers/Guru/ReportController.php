@@ -20,7 +20,7 @@ class ReportController extends Controller
         
         // Get all classes taught by this teacher
         $schedules = $teacher->teachingSchedules()->with('class')->get();
-        $classes = $schedules->pluck('class')->unique('id');
+        $classes = $schedules->pluck('class')->unique('id')->values();
 
         $months = [];
         for ($i = 0; $i < 12; $i++) {

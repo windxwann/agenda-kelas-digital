@@ -55,63 +55,72 @@
                 </div>
                 
                 <!-- Navigation -->
-                <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-hide">
-                    <a href="{{ route('sekretaris.dashboard') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('sekretaris.dashboard') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5 {{ request()->routeIs('sekretaris.dashboard') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Dashboard</span>
-                        @if(request()->routeIs('sekretaris.dashboard'))
-                            <span class="ml-auto w-1.5 h-8 bg-blue-600 rounded-full"></span>
-                        @endif
-                    </a>
+                <nav class="flex-1 px-4 py-6 space-y-6 overflow-y-auto scrollbar-hide">
                     
-                    <a href="{{ route('sekretaris.agenda.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('sekretaris.agenda.*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5 {{ request()->routeIs('sekretaris.agenda.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Agenda Kelas</span>
-                        @if(request()->routeIs('sekretaris.agenda.*'))
-                            <span class="ml-auto w-1.5 h-8 bg-blue-600 rounded-full"></span>
-                        @endif
-                    </a>
-                    
-                    <a href="{{ route('sekretaris.attendance.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('sekretaris.attendance.index') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5 {{ request()->routeIs('sekretaris.attendance.index') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Presensi Siswa</span>
-                        @if(request()->routeIs('sekretaris.attendance.index'))
-                            <span class="ml-auto w-1.5 h-8 bg-blue-600 rounded-full"></span>
-                        @endif
-                    </a>
-                    
-                    <a href="{{ route('sekretaris.attendance.report') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('sekretaris.attendance.report') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <svg class="w-5 h-5 {{ request()->routeIs('sekretaris.attendance.report') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Laporan</span>
-                        @if(request()->routeIs('sekretaris.attendance.report'))
-                            <span class="ml-auto w-1.5 h-8 bg-blue-600 rounded-full"></span>
-                        @endif
-                    </a>
+                    <!-- Section: Utama -->
+                    <div>
+                        <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Utama</p>
+                        <a href="{{ route('sekretaris.dashboard') }}" 
+                           class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('sekretaris.dashboard') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('sekretaris.dashboard') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                            <span class="ml-3 font-medium">Dashboard</span>
+                        </a>
+                    </div>
 
-                    @if(Auth::user()->hasRole('siswa'))
-                    <div class="mt-8 mb-4 px-4">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Akses Portal</p>
+                    <!-- Section: Agenda -->
+                    <div>
+                        <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Agenda</p>
+                        <a href="{{ route('sekretaris.agenda.index') }}" 
+                           class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('sekretaris.agenda.*') && !request()->routeIs('sekretaris.agenda.archive') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('sekretaris.agenda.*') && !request()->routeIs('sekretaris.agenda.archive') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span class="ml-3 font-medium">Agenda Kelas</span>
+                        </a>
+                        
+                        <a href="{{ route('sekretaris.agenda.archive') }}" 
+                           class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('sekretaris.agenda.archive') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('sekretaris.agenda.archive') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                            </svg>
+                            <span class="ml-3 font-medium">Arsip Agenda</span>
+                        </a>
+                    </div>
+
+                    <!-- Section: Presensi -->
+                    <div>
+                        <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Presensi</p>
+                        <a href="{{ route('sekretaris.attendance.index') }}" 
+                           class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('sekretaris.attendance.index') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('sekretaris.attendance.index') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="ml-3 font-medium">Presensi Siswa</span>
+                        </a>
+                        
+                        <a href="{{ route('sekretaris.attendance.report') }}" 
+                           class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all group {{ request()->routeIs('sekretaris.attendance.report') ? 'bg-blue-50 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('sekretaris.attendance.report') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span class="ml-3 font-medium">Laporan</span>
+                        </a>
                     </div>
                     
-                    <a href="{{ route('siswa.dashboard') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all group">
-                        <svg class="w-5 h-5 text-gray-400 group-hover:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                        <span class="ml-3 font-medium">Portal Siswa</span>
-                    </a>
+                    @if(Auth::user()->hasRole('siswa'))
+                    <!-- Section: Akses -->
+                    <div>
+                        <p class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Akses</p>
+                        <a href="{{ route('siswa.dashboard') }}" 
+                           class="flex items-center px-4 py-3 text-gray-700 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all group">
+                            <svg class="w-5 h-5 text-gray-400 group-hover:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            <span class="ml-3 font-medium">Portal Siswa</span>
+                        </a>
+                    </div>
                     @endif
                 </nav>
                 
@@ -196,7 +205,7 @@
             </header>
             
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto bg-gray-50">
+            <main class="flex-1 overflow-y-auto bg-gray-50 scrollbar-hide">
                 <div class="px-4 sm:px-6 lg:px-8 py-8">
                     @if(session('success'))
                         <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-xl shadow-sm">

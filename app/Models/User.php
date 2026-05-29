@@ -59,4 +59,37 @@ class User extends Authenticatable
     {
         return $this->hasMany(Schedule::class, 'teacher_id');
     }
+
+    public function classHistories()
+    {
+        return $this->hasMany(ClassHistory::class);
+    }
+
+    public function academicYears()
+    {
+        return $this->belongsToMany(AcademicYear::class, 'class_histories');
+    }
+
+    public function getClassInAcademicYear($academicYearId)
+    {
+        $history = $this->classHistories()->where('academic_year_id', $academicYearId)->first();
+        return $history ? $history->class : null;
+    }
+
+    public function scopeInClassAndAcademicYear($query, $classId, $academicYearId)
+    {
+        return $query->where(function($q) use ($classId, $academicYearId) {
+            $q->whereHas('classHistories', function($qh) use ($classId, $academicYearId) {
+                $qh->where('class_id', $classId)->where('academic_year_id', $academicYearId);
+            })->orWhere(function($qo) use ($classId, $academicYearId) {
+                $qo->where('class_id', $classId)
+                   ->whereNotExists(function($qe) use ($academicYearId) {
+                       $qe->select(\Illuminate\Support\Facades\DB::raw(1))
+                          ->from('class_histories')
+                          ->whereColumn('class_histories.user_id', 'users.id')
+                          ->where('class_histories.academic_year_id', $academicYearId);
+                   });
+            });
+        });
+    }
 }

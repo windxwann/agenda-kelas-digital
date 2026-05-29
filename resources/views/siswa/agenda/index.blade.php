@@ -45,6 +45,19 @@
                     </select>
                 </div>
 
+                <!-- Academic Year Filter -->
+                <div class="w-full sm:w-56">
+                    <select name="academic_year_id" onchange="this.form.submit()"
+                            class="block w-full px-4 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-semibold">
+                        <option value="">Tahun Ajaran (Aktif)</option>
+                        @foreach($academicYears as $year)
+                            <option value="{{ $year->id }}" {{ request('academic_year_id') == $year->id ? 'selected' : '' }}>
+                                {{ $year->name }} {{ $year->is_active ? '(Aktif)' : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Filter Button -->
                 <button type="submit" 
                         class="inline-flex items-center justify-center px-6 py-3.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all duration-200">
@@ -52,7 +65,7 @@
                 </button>
 
                 <!-- Reset Button -->
-                @if(request()->anyFilled(['search', 'subject_id']))
+                @if(request()->anyFilled(['search', 'subject_id', 'academic_year_id']))
                     <a href="{{ route('siswa.agenda.index') }}" 
                        class="inline-flex items-center justify-center px-4 py-3.5 text-sm font-semibold text-red-500 hover:bg-red-50 rounded-xl transition-all">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

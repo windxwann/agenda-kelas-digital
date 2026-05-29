@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\Schedule;
+use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -13,7 +14,19 @@ class ScheduleController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $classId = $user->class_id;
+        
+        $academicYearId = $request->query('academic_year_id');
+        if (!$academicYearId) {
+            $activeYear = AcademicYear::where('is_active', true)->first();
+            $academicYearId = $activeYear ? $activeYear->id : null;
+        }
+
+        $class = null;
+        if ($academicYearId) {
+            $class = $user->getClassInAcademicYear($academicYearId);
+        }
+        $classId = $class ? $class->id : $user->class_id;
+
         $date = $request->input('date', Carbon::today()->format('Y-m-d'));
         $delta = (int) $request->input('delta', 0);
         
@@ -60,12 +73,16 @@ class ScheduleController extends Controller
             }
         }
 
+        $academicYears = AcademicYear::orderBy('name', 'desc')->get();
+
         return view('siswa.schedule.index', [
             'days' => $days,
             'schedules' => $schedules,
             'weekRange' => $weekRange,
             'currentDate' => $currentDate->format('Y-m-d'),
             'todayIndex' => $todayIndex,
+            'academicYears' => $academicYears,
+            'currentAcademicYearId' => $academicYearId,
         ]);
     }
 

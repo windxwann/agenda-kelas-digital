@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasAcademicYear;
 
 class Agenda extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAcademicYear;
 
     protected $fillable = [
         'class_id',
@@ -19,6 +20,7 @@ class Agenda extends Model
         'description',
         'attachments',
         'status',
+        'academic_year_id',
     ];
 
     protected $casts = [

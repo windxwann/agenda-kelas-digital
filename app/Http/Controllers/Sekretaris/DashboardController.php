@@ -42,9 +42,7 @@ class DashboardController extends Controller
         $class = Classes::withCount('students')->find($classId);
         
         if ($class) {
-            $present = Attendance::whereHas('student', function($q) use ($classId) {
-                    $q->where('class_id', $classId);
-                })
+            $present = Attendance::where('class_id', $classId)
                 ->where('date', date('Y-m-d'))
                 ->where('status', 'present')
                 ->count();
@@ -67,9 +65,7 @@ class DashboardController extends Controller
         $monthly_attendance = collect();
         $startOfRange = \Carbon\Carbon::now()->subMonths(5)->startOfMonth();
         
-        $attendanceStats = Attendance::whereHas('student', function($q) use ($classId) {
-                $q->where('class_id', $classId);
-            })
+        $attendanceStats = Attendance::where('class_id', $classId)
             ->where('date', '>=', $startOfRange)
             ->select(
                 DB::raw("strftime('%Y-%m', date) as month_key"),
@@ -90,7 +86,7 @@ class DashboardController extends Controller
             $excused = $monthStats->where('status', 'excused')->sum('total');
             $absent = $monthStats->where('status', 'absent')->sum('total');
             $sick = $monthStats->where('status', 'sick')->sum('total');
-            $total = $present + $late + $excused + $absent + $sick;
+            $totalCount = $present + $late + $excused + $absent + $sick;
             
             $monthly_attendance->push([
                 'month' => $date->translatedFormat('F'),
@@ -99,7 +95,7 @@ class DashboardController extends Controller
                 'excused' => (int)$excused,
                 'absent' => (int)$absent,
                 'sick' => (int)$sick,
-                'percentage' => $total > 0 ? round((($present + $late) / $total) * 100, 1) : 0,
+                'percentage' => $totalCount > 0 ? round((($present + $late) / $totalCount) * 100, 1) : 0,
             ]);
         }
         
@@ -108,21 +104,30 @@ class DashboardController extends Controller
     
     private function getAverageAttendance($classId)
     {
-        $total = Attendance::whereHas('student', function($q) use ($classId) {
-                $q->where('class_id', $classId);
-            })
-            ->whereMonth('date', date('m'))
-            ->count();
+        $class = Classes::withCount('students')->find($classId);
+        if (!$class || $class->students_count == 0) return 0;
 
-        if ($total == 0) return 0;
+        $month = date('m');
+        $year = date('Y');
+
+        // Get total potential attendance (students * school days in month so far)
+        // For simplicity, we'll count unique dates where attendance was recorded for this class this month
+        $activeDays = Attendance::where('class_id', $classId)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->distinct()
+            ->count('date');
+
+        if ($activeDays == 0) return 0;
+
+        $totalPotential = $activeDays * $class->students_count;
         
-        $present = Attendance::whereHas('student', function($q) use ($classId) {
-                $q->where('class_id', $classId);
-            })
-            ->where('status', 'present')
-            ->whereMonth('date', date('m'))
+        $totalPresent = Attendance::where('class_id', $classId)
+            ->whereIn('status', ['present', 'late'])
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
             ->count();
             
-        return round(($present / $total) * 100, 1);
+        return round(($totalPresent / $totalPotential) * 100, 1);
     }
 }

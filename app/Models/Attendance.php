@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasAcademicYear;
 
 class Attendance extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAcademicYear;
 
     protected $fillable = [
         'student_id',
@@ -16,6 +17,7 @@ class Attendance extends Model
         'status',
         'note',
         'check_in_time',
+        'academic_year_id',
     ];
 
     protected $casts = [

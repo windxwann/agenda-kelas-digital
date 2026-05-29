@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Classes;
 use App\Models\Subject;
 use App\Models\Agenda;
+use App\Models\AcademicYear;
+use App\Models\Room;
 use Illuminate\Http\Request;
 
 class SearchController extends Controller
@@ -26,7 +28,7 @@ class SearchController extends Controller
                   ->orWhere('nis', 'like', "%{$query}%")
                   ->orWhere('email', 'like', "%{$query}%")
                   ->orWhereHas('class', function($subQuery) use ($query) {
-                      $subQuery->where('academic_year', 'like', "%{$query}%");
+                      $subQuery->where('name', 'like', "%{$query}%");
                   });
             })
             ->with('class')
@@ -44,7 +46,6 @@ class SearchController extends Controller
 
         // Search Classes
         $classes = Classes::where('name', 'like', "%{$query}%")
-            ->orWhere('academic_year', 'like', "%{$query}%")
             ->with('homeroomTeacher')
             ->take(5)
             ->get();
@@ -63,7 +64,17 @@ class SearchController extends Controller
             ->take(5)
             ->get();
 
-        $totalResults = $students->count() + $teachers->count() + $classes->count() + $subjects->count() + $agendas->count();
+        // Search Academic Years
+        $academicYears = AcademicYear::where('name', 'like', "%{$query}%")
+            ->take(5)
+            ->get();
+
+        // Search Rooms
+        $rooms = Room::where('name', 'like', "%{$query}%")
+            ->take(5)
+            ->get();
+
+        $totalResults = $students->count() + $teachers->count() + $classes->count() + $subjects->count() + $agendas->count() + $academicYears->count() + $rooms->count();
 
         return view('admin.search_results', [
             'query' => $query,
@@ -72,6 +83,8 @@ class SearchController extends Controller
             'resultClasses' => $classes,
             'resultSubjects' => $subjects,
             'resultAgendas' => $agendas,
+            'resultAcademicYears' => $academicYears,
+            'resultRooms' => $rooms,
             'totalResults' => $totalResults
         ]);
     }

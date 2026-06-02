@@ -49,7 +49,7 @@ class SubjectController extends Controller
             'code' => 'required|string|max:20|unique:subjects,code',
             'name' => 'required|string|max:255',
             'teacher_id' => 'required|exists:users,id',
-            'credit_hours' => 'required|integer|min:1|max:40',
+            'credit_hours' => 'required|integer|min:1|max:8',
             'description' => 'nullable|string|max:500'
         ]);
 
@@ -101,7 +101,7 @@ class SubjectController extends Controller
             'code' => 'required|string|max:20|unique:subjects,code,' . $subject->id,
             'name' => 'required|string|max:255',
             'teacher_id' => 'required|exists:users,id',
-            'credit_hours' => 'required|integer|min:1|max:40',
+            'credit_hours' => 'required|integer|min:1|max:8',
             'description' => 'nullable|string|max:500'
         ]);
 

@@ -41,6 +41,8 @@ class ScheduleController extends Controller
             $dayDate = $startOfWeek->copy()->addDays($i);
             $days[$i] = [
                 'name' => $dayDate->translatedFormat('l'),
+                'day_number' => $dayDate->format('d'),
+                'month_name' => $dayDate->translatedFormat('M'),
                 'date' => $dayDate->format('d/m'),
                 'is_today' => $dayDate->isToday(),
                 'date_full' => $dayDate->format('Y-m-d')

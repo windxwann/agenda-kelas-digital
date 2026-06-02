@@ -60,11 +60,14 @@
                     <!-- Jam Pelajaran -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Jam Pelajaran Per Minggu <span class="text-red-500">*</span></label>
-                        <input type="number" name="credit_hours" value="{{ old('credit_hours', 2) }}" min="1" max="40" required
-                               class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm @error('credit_hours') border-red-500 @enderror"
-                               placeholder="Contoh: 4">
+                        <select name="credit_hours" required
+                                class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 transition-all text-sm @error('credit_hours') border-red-500 @enderror">
+                            @for($i = 1; $i <= 8; $i++)
+                                <option value="{{ $i }}" {{ old('credit_hours', 2) == $i ? 'selected' : '' }}>{{ $i }} JP</option>
+                            @endfor
+                        </select>
                         @error('credit_hours') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                        <p class="text-[10px] text-gray-500 mt-1">1 JP = 45 menit. Masukkan total JP per minggu.</p>
+                        <p class="text-[10px] text-gray-500 mt-1">Pilih total jam pelajaran (JP) per minggu.</p>
                     </div>
                 </div>
                 

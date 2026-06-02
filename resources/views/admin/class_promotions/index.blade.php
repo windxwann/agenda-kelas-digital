@@ -4,7 +4,7 @@
 @section('header', 'Kenaikan Kelas')
 
 @section('content')
-<div class="space-y-8 pb-8" x-data="promotionApp()">
+<div class="space-y-8 pb-8" x-data="promotionApp({{ Js::from($classes) }})">
 
     @if(!$activeYear)
     <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl flex items-start gap-3">
@@ -32,6 +32,13 @@
     <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl flex items-start gap-3">
         <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         <p class="font-medium">{{ session('success') }}</p>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="bg-red-50 border border-red-200 text-red-800 p-4 rounded-2xl flex items-start gap-3">
+        <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <p class="font-medium">{{ session('error') }}</p>
     </div>
     @endif
 
@@ -63,12 +70,26 @@
 
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">2. Kelas Tujuan</label>
-                <select x-model="targetClassId" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+                <select x-model="targetClassId" :disabled="isXIISelected" 
+                        :class="isXIISelected ? 'opacity-50 cursor-not-allowed bg-gray-200' : ''"
+                        class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
                     <option value="">-- Pilih Kelas Tujuan --</option>
-                    @foreach($classes as $class)
-                        <option value="{{ $class->id }}">{{ $class->name }}</option>
-                    @endforeach
+                    <template x-for="cls in filteredTargetClasses" :key="cls.id">
+                        <option :value="cls.id" x-text="cls.name"></option>
+                    </template>
                 </select>
+                
+                <p x-show="sourceClassId && filteredTargetClasses.length === 0 && !isXIISelected" class="text-[10px] text-amber-600 font-bold mt-2">
+                    Tidak ada kelas dengan tingkat yang sama atau lebih tinggi.
+                </p>
+
+                <div x-show="isXIISelected" class="mt-4 p-4 bg-rose-50 border border-rose-100 rounded-xl">
+                    <p class="text-xs font-bold text-rose-700">⚠️ Kelas XII Tidak Bisa Naik Kelas</p>
+                    <p class="text-[10px] text-rose-600 mt-1">Siswa kelas XII sudah berada di tingkat akhir. Untuk memproses siswa yang lulus, silakan gunakan menu kelulusan.</p>
+                    <a href="{{ route('admin.students.bulk-graduation') }}" class="inline-block mt-3 px-4 py-2 bg-rose-600 text-white text-[10px] font-bold rounded-lg hover:bg-rose-700 transition-colors">
+                        Ke Menu Kelulusan →
+                    </a>
+                </div>
             </div>
 
             <div>
@@ -168,8 +189,9 @@
 
 @push('scripts')
 <script>
-function promotionApp() {
+function promotionApp(classes) {
     return {
+        classes: classes,
         sourceClassId: '',
         targetClassId: '',
         newHomeroomId: '',
@@ -178,11 +200,34 @@ function promotionApp() {
         selectedIds: [],
         loading: false,
 
+        get filteredTargetClasses() {
+            if (!this.sourceClassId) return this.classes;
+            
+            const sourceClass = this.classes.find(c => c.id == this.sourceClassId);
+            if (!sourceClass) return this.classes;
+
+            const gradeMapping = { 'X': 10, 'XI': 11, 'XII': 12 };
+            const sourceLevel = gradeMapping[sourceClass.grade_level] || 0;
+
+            return this.classes.filter(c => {
+                const targetLevel = gradeMapping[c.grade_level] || 0;
+                // Allow same grade level (repeating/moving) or higher
+                return targetLevel >= sourceLevel && c.id != this.sourceClassId;
+            });
+        },
+
+        get isXIISelected() {
+            if (!this.sourceClassId) return false;
+            const sourceClass = this.classes.find(c => c.id == this.sourceClassId);
+            return sourceClass && sourceClass.grade_level === 'XII';
+        },
+
         async loadStudents() {
             if (!this.sourceClassId) { this.students = []; return; }
             this.loading = true;
             this.students = [];
             this.selectedIds = [];
+            this.targetClassId = ''; // Reset target class when source changes
             try {
                 const res = await fetch(`/admin/class-promotions/preview?class_id=${this.sourceClassId}`);
                 const data = await res.json();

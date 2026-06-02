@@ -62,6 +62,27 @@ class ClassPromotionController extends Controller
         $targetYearId   = $request->target_year_id;
         $studentIds     = $request->student_ids;
 
+        $sourceClass = Classes::findOrFail($sourceClassId);
+        $targetClass = Classes::findOrFail($targetClassId);
+
+        // Grade level mapping
+        $gradeMapping = [
+            'X'   => 10,
+            'XI'  => 11,
+            'XII' => 12,
+        ];
+
+        $sourceLevel = $gradeMapping[$sourceClass->grade_level] ?? 0;
+        $targetLevel = $gradeMapping[$targetClass->grade_level] ?? 0;
+
+        if ($sourceLevel == 12) {
+            return redirect()->back()->with('error', 'Siswa kelas XII tidak dapat melakukan kenaikan kelas karena sudah tingkat akhir. Silakan gunakan menu Kelulusan untuk meluluskan siswa.')->withInput();
+        }
+
+        if ($targetLevel < $sourceLevel) {
+            return redirect()->back()->with('error', 'Siswa tidak dapat dinaikkan ke tingkat kelas yang lebih rendah!')->withInput();
+        }
+
         // Find or get the source academic year (the currently active one, which is the "before" year)
         $sourceYear = AcademicYear::where('is_active', true)->first();
 

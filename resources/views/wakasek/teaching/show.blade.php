@@ -5,108 +5,129 @@
 @section('header', 'Detail Jurnal Mengajar')
 
 @section('content')
-<div class="space-y-8 pb-8">
+<div class="space-y-6 pb-8">
     <!-- Header Section -->
-    <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="bg-white rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 shadow-sm relative overflow-hidden">
+        <div class="absolute top-0 right-0 -mt-16 -mr-16 w-48 h-48 bg-indigo-50 rounded-full blur-3xl opacity-50"></div>
+        <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-4 mb-2">
+                <div class="flex items-center gap-4 mb-3">
                     <a href="{{ route('wakasek-kurikulum.teaching.index') }}" class="w-10 h-10 bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl flex items-center justify-center transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     </a>
-                    <h1 class="text-2xl font-black text-gray-900 tracking-tight">{{ $teacher->name }}</h1>
+                    <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight truncate">{{ $teacher->name }}</h1>
                 </div>
-                <p class="text-sm text-gray-500 font-medium ml-14">
-                    NIP: {{ $teacher->nip ?? '-' }} | Email: {{ $teacher->email }}
-                </p>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 ml-14">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">NIP: {{ $teacher->nip ?? '-' }}</span>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Email: {{ $teacher->email }}</span>
+                </div>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="px-6 py-3 bg-blue-50 text-blue-600 rounded-2xl flex items-center gap-3 border border-blue-100 shadow-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                    </svg>
-                    <div>
-                        <div class="text-[10px] font-black uppercase tracking-widest opacity-80">Total Sesi</div>
-                        <div class="text-xl font-black leading-none mt-1">{{ $agendas->total() }}</div>
+            <div class="flex items-center ml-14 md:ml-0">
+                <div class="px-5 py-2.5 bg-blue-50 text-blue-600 rounded-2xl flex items-center gap-3 border border-blue-100 shadow-sm">
+                    <div class="text-center">
+                        <div class="text-[8px] font-black uppercase tracking-widest opacity-60">Total Jurnal</div>
+                        <div class="text-lg font-black leading-none mt-1">{{ $agendas->total() }}</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Table Section -->
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="bg-gray-50/50">
-                        <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest w-48">Tanggal & Waktu</th>
-                        <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest w-48">Kelas & Mata Pelajaran</th>
-                        <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest min-w-[300px]">Materi & Catatan</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50 bg-white">
-                    @forelse($agendas as $agenda)
-                        <tr class="group hover:bg-gray-50/50 transition-colors">
-                            <td class="px-8 py-6 align-top">
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                        {{ \Carbon\Carbon::parse($agenda->date)->translatedFormat('l, d M Y') }}
-                                    </span>
-                                    @if($agenda->room)
-                                    <span class="text-xs text-gray-500 font-medium mt-1">
-                                        Ruang: {{ $agenda->room }}
-                                    </span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-8 py-6 align-top">
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-bold text-gray-900">
-                                        {{ $agenda->class->name ?? '-' }}
-                                    </span>
-                                    <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider mt-1">
-                                        {{ $agenda->subject->name ?? '-' }}
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="px-8 py-6">
-                                <div class="flex flex-col gap-3">
-                                    <div>
-                                        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Materi / Kegiatan</div>
-                                        <p class="text-sm text-gray-700 leading-relaxed font-semibold">{{ $agenda->title ?? '-' }}</p>
-                                    </div>
-                                    @if($agenda->description)
-                                    <div>
-                                        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Deskripsi / Catatan</div>
-                                        <div class="text-sm text-gray-500 leading-relaxed italic prose prose-sm max-w-none">{!! $agenda->description !!}</div>
-                                    </div>
-                                    @endif
-                                    @if($agenda->attachments)
-                                    <div class="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-600 rounded-lg text-xs font-medium border border-amber-100 self-start">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                                        </svg>
-                                        Tugas / Lampiran
-                                    </div>
-                                    @endif
-                                </div>
-                            </td>
+    <!-- Content Display -->
+    <div class="space-y-4">
+        {{-- Desktop View (Table) --}}
+        <div class="hidden lg:block bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-gray-50/50">
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest w-48">Waktu</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest w-48">Kelas & Mapel</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest min-w-[300px]">Detail Aktivitas</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" class="px-8 py-12 text-center text-gray-400 font-medium italic">Belum ada jurnal mengajar yang tercatat.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 bg-white">
+                        @forelse($agendas as $agenda)
+                            <tr class="group hover:bg-gray-50/50 transition-colors">
+                                <td class="px-8 py-6 align-top">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-black text-gray-900 group-hover:text-blue-600 transition-colors">
+                                            {{ \Carbon\Carbon::parse($agenda->date)->translatedFormat('d M Y') }}
+                                        </span>
+                                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter mt-1">
+                                            {{ \Carbon\Carbon::parse($agenda->date)->translatedFormat('l') }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6 align-top">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-black text-gray-900">{{ $agenda->class->name ?? '-' }}</span>
+                                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">{{ $agenda->subject->name ?? '-' }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <div class="space-y-3">
+                                        <p class="text-sm text-gray-800 font-bold leading-relaxed">{{ $agenda->title }}</p>
+                                        @if($agenda->description)
+                                        <div class="text-xs text-gray-500 leading-relaxed italic prose prose-sm max-w-none">{!! $agenda->description !!}</div>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-8 py-20 text-center text-gray-400 font-medium italic">Belum ada catatan mengajar.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Mobile View (Cards) --}}
+        <div class="lg:hidden space-y-4">
+            @forelse($agendas as $agenda)
+                <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-indigo-600 text-white rounded-2xl flex flex-col items-center justify-center shadow-lg shadow-indigo-200">
+                                <span class="text-[8px] font-black uppercase leading-none opacity-60 mb-0.5">{{ \Carbon\Carbon::parse($agenda->date)->translatedFormat('M') }}</span>
+                                <span class="text-sm font-black leading-none">{{ \Carbon\Carbon::parse($agenda->date)->format('d') }}</span>
+                            </div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-sm font-black text-gray-900 truncate">{{ $agenda->class->name }}</span>
+                                <span class="text-[9px] font-bold text-blue-600 uppercase tracking-widest truncate">{{ $agenda->subject->name }}</span>
+                            </div>
+                        </div>
+                        @if($agenda->room)
+                        <span class="px-2.5 py-1 bg-gray-50 text-gray-400 text-[8px] font-black uppercase tracking-widest rounded-lg border border-gray-100">
+                            {{ $agenda->room }}
+                        </span>
+                        @endif
+                    </div>
+                    
+                    <div class="bg-gray-50/50 rounded-2xl p-4 space-y-2">
+                        <p class="text-sm font-black text-gray-800 leading-tight">{{ $agenda->title }}</p>
+                        @if($agenda->description)
+                        <div class="text-xs text-gray-500 leading-relaxed line-clamp-3 italic">{!! strip_tags($agenda->description) !!}</div>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center justify-between text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] px-1">
+                        <span>{{ \Carbon\Carbon::parse($agenda->date)->translatedFormat('l') }}</span>
+                        <span>TERBIT</span>
+                    </div>
+                </div>
+            @empty
+                <div class="bg-white p-12 rounded-[2rem] border border-gray-100 text-center">
+                    <p class="text-sm text-gray-400 italic">Belum ada catatan mengajar.</p>
+                </div>
+            @endforelse
         </div>
         
         @if($agendas->hasPages())
-        <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-100">
-            {{ $agendas->links() }}
+        <div class="pt-6">
+            {{ $agendas->appends(request()->query())->links() }}
         </div>
         @endif
     </div>

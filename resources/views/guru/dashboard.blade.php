@@ -7,7 +7,7 @@
 @section('content')
 <div class="space-y-6 sm:space-y-8 pb-8">
     <!-- Welcome Banner -->
-    <div class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-600 to-violet-700 rounded-[2.5rem] p-6 sm:p-8 text-white shadow-xl shadow-blue-500/20">
+    <div class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-600 to-violet-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-blue-500/20">
         <div class="absolute top-0 right-0 -mt-20 -mr-20 w-48 sm:w-64 h-48 sm:h-64 bg-white/10 rounded-full blur-3xl"></div>
         <div class="absolute bottom-0 left-0 -mb-20 -ml-20 w-48 sm:w-64 h-48 sm:h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
         

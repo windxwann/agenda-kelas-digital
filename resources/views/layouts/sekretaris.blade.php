@@ -29,7 +29,7 @@
             x-transition:leave-start="translate-x-0"
             x-transition:leave-end="-translate-x-full"
             @click.away="sidebarOpen = window.innerWidth < 1024 ? false : true"
-            class="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-2xl lg:relative lg:translate-x-0 lg:block"
+            class="fixed inset-y-0 left-0 z-50 w-64 lg:w-72 bg-white shadow-2xl lg:relative lg:translate-x-0 lg:block"
             :class="{'hidden': !sidebarOpen && window.innerWidth < 1024, 'lg:block': true}">
             <div class="flex flex-col h-full">
                 <!-- Logo -->

@@ -161,20 +161,23 @@
     </div>
 
     {{-- Grafik Kehadiran --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <div class="flex items-center space-x-3 mb-6">
-            <div class="p-2 bg-purple-50 text-purple-600 rounded-lg">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-gray-800">Grafik Kehadiran</h3>
+                    <p class="text-xs text-gray-500">6 bulan terakhir</p>
+                </div>
             </div>
-            <div>
-                <h3 class="font-bold text-gray-800">Grafik Kehadiran</h3>
-                <p class="text-xs text-gray-500">6 bulan terakhir</p>
-            </div>
+            <span class="text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-lg">6 Bulan</span>
         </div>
-        <div class="overflow-x-auto">
-            <div id="attendanceChart" class="min-w-[600px] h-80"></div>
+        <div class="px-4 pt-2 pb-4">
+            <div id="attendanceChart"></div>
         </div>
     </div>
 @endsection
@@ -204,32 +207,49 @@
                 data: monthlyData.map(item => item.sick)
             }],
             chart: {
-                height: 300,
+                height: 280,
                 type: 'bar',
                 stacked: true,
                 toolbar: { show: false },
-                fontFamily: 'Inter, sans-serif'
+                fontFamily: 'Inter, sans-serif',
+                animations: { enabled: true, speed: 400 }
             },
             plotOptions: {
                 bar: {
-                    columnWidth: '40%',
-                    borderRadius: 4
+                    columnWidth: '45%',
+                    borderRadius: 5,
+                    borderRadiusApplication: 'end'
                 }
             },
-            colors: ['#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#F97316'], // Hijau, Oranye, Merah, Biru, Oranye Cerah
+            colors: ['#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#F97316'],
             xaxis: {
                 categories: monthlyData.map(item => item.month),
-                labels: { style: { colors: '#94a3b8', fontSize: '11px' } }
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 600 } }
             },
             yaxis: {
                 labels: { style: { colors: '#94a3b8', fontSize: '11px' } }
             },
-            legend: {
-                position: 'top',
-                horizontalAlign: 'center'
+            grid: {
+                borderColor: '#f1f5f9',
+                strokeDashArray: 4,
+                yaxis: { lines: { show: true } },
+                xaxis: { lines: { show: false } }
             },
+            legend: {
+                position: 'bottom',
+                horizontalAlign: 'center',
+                fontSize: '11px',
+                fontWeight: 600,
+                markers: { size: 8, shape: 'square' },
+                itemMargin: { horizontal: 8, vertical: 4 }
+            },
+            dataLabels: { enabled: false },
             tooltip: {
-                theme: 'light'
+                theme: 'light',
+                shared: true,
+                intersect: false
             }
         };
 

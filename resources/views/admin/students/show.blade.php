@@ -126,12 +126,76 @@
                         <p class="text-2xl font-black text-blue-600">{{ $attendance_stats['excused'] }}</p>
                         <p class="text-[10px] font-bold text-blue-800 uppercase tracking-wider mt-1">Izin</p>
                     </div>
+                    <div class="bg-orange-50 rounded-xl p-4 border border-orange-100 text-center">
+                        <p class="text-2xl font-black text-orange-600">{{ $attendance_stats['sick'] }}</p>
+                        <p class="text-[10px] font-bold text-orange-800 uppercase tracking-wider mt-1">Sakit</p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Main Content Area -->
         <div class="lg:col-span-2 space-y-8">
+            <!-- Riwayat Kelas -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-900">Riwayat Kelas</h3>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-100">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tahun Ajaran</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Kelas</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tingkat</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Wali Kelas</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            @forelse($student->classHistories->sortByDesc(function($history) { return $history->academicYear->name ?? ''; }) as $history)
+                            <tr class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ $history->academicYear->name ?? '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
+                                    {{ $history->class->name ?? '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2.5 py-1 text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg">
+                                        Kelas {{ $history->class->grade_level ?? '-' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600">
+                                    <div class="flex items-center gap-2">
+                                        @if($history->class && $history->class->homeroomTeacher)
+                                            <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs">
+                                                {{ strtoupper(substr($history->class->homeroomTeacher->name, 0, 1)) }}
+                                            </div>
+                                            <span>{{ $history->class->homeroomTeacher->name }}</span>
+                                        @else
+                                            <span class="text-gray-400 italic">Belum ditentukan</span>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-12 text-center text-gray-400">
+                                    <div class="flex flex-col items-center">
+                                        <svg class="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                        </svg>
+                                        <p class="text-sm">Belum ada riwayat kelas.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Riwayat Kehadiran -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
@@ -160,13 +224,15 @@
                                             'present' => 'bg-green-50 text-green-700 border-green-100',
                                             'absent' => 'bg-red-50 text-red-700 border-red-100',
                                             'late' => 'bg-yellow-50 text-yellow-700 border-yellow-100',
-                                            'excused' => 'bg-blue-50 text-blue-700 border-blue-100'
+                                            'excused' => 'bg-blue-50 text-blue-700 border-blue-100',
+                                            'sick' => 'bg-orange-50 text-orange-700 border-orange-100'
                                         ];
                                         $statusLabels = [
                                             'present' => 'Hadir',
                                             'absent' => 'Alpha',
                                             'late' => 'Terlambat',
-                                            'excused' => 'Izin'
+                                            'excused' => 'Izin',
+                                            'sick' => 'Sakit'
                                         ];
                                     @endphp
                                     <span class="px-2.5 py-1 text-xs font-bold {{ $statusColors[$attendance->status] }} border rounded-lg">

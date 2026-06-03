@@ -64,6 +64,10 @@ class ClassPromotionController extends Controller
 
         $sourceClass = Classes::findOrFail($sourceClassId);
         $targetClass = Classes::findOrFail($targetClassId);
+        
+        if ($sourceClass->major !== $targetClass->major) {
+            return redirect()->back()->with('error', 'Siswa tidak dapat dipindahkan ke kelas dengan jurusan yang berbeda!')->withInput();
+        }
 
         // Grade level mapping
         $gradeMapping = [

@@ -67,11 +67,15 @@ class DashboardController extends Controller
             ]);
         }
 
+        // Class Histories
+        $class_histories = $user->classHistories()->with(['class.homeroomTeacher', 'academicYear'])->get()->sortByDesc(function($history) { return $history->academicYear->name ?? ''; });
+
         return view('siswa.dashboard', compact(
             'attendance_stats',
             'recent_agendas',
             'today_schedules',
-            'monthly_attendance'
+            'monthly_attendance',
+            'class_histories'
         ));
     }
 }

@@ -99,7 +99,10 @@ class DashboardController extends Controller
             ]);
         }
         
-        return view('sekretaris.dashboard', compact('stats', 'today_attendance', 'recent_agendas', 'monthly_attendance'));
+        // Class Histories for Sekretaris (who is a student)
+        $class_histories = Auth::user()->classHistories()->with(['class.homeroomTeacher', 'academicYear'])->get()->sortByDesc(function($history) { return $history->academicYear->name ?? ''; });
+
+        return view('sekretaris.dashboard', compact('stats', 'today_attendance', 'recent_agendas', 'monthly_attendance', 'class_histories'));
     }
     
     private function getAverageAttendance($classId)

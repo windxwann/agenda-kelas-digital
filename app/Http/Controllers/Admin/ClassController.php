@@ -38,7 +38,14 @@ class ClassController extends Controller
      */
     public function create()
     {
-        $teachers = User::role('teacher')->get();
+        $assignedTeacherIds = Classes::whereNotNull('homeroom_teacher_id')
+            ->where('is_active', true)
+            ->pluck('homeroom_teacher_id');
+
+        $teachers = User::role('teacher')
+            ->whereNotIn('id', $assignedTeacherIds)
+            ->get();
+            
         return view('admin.classes.create', compact('teachers'));
     }
 
@@ -57,6 +64,7 @@ class ClassController extends Controller
                                  ->where('academic_year', $request->academic_year);
                 })
             ],
+            'major' => 'required|string|max:255',
             'grade_level' => 'required|in:X,XI,XII',
             'academic_year' => 'required|string',
             'homeroom_teacher_id' => [
@@ -112,7 +120,16 @@ class ClassController extends Controller
             $class = Classes::findOrFail($class);
         }
         $class->loadCount('students');
-        $teachers = User::role('teacher')->get();
+        
+        $assignedTeacherIds = Classes::whereNotNull('homeroom_teacher_id')
+            ->where('is_active', true)
+            ->where('id', '!=', $class->id)
+            ->pluck('homeroom_teacher_id');
+
+        $teachers = User::role('teacher')
+            ->whereNotIn('id', $assignedTeacherIds)
+            ->get();
+            
         return view('admin.classes.edit', compact('class', 'teachers'));
     }
 
@@ -134,6 +151,7 @@ class ClassController extends Controller
                                  ->where('academic_year', $request->academic_year);
                 })->ignore($class->id)
             ],
+            'major' => 'required|string|max:255',
             'grade_level' => 'required|in:X,XI,XII',
             'academic_year' => 'required|string',
             'homeroom_teacher_id' => [

@@ -78,7 +78,7 @@ class StudentController extends Controller
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:500',
             'password' => 'required|string|min:6',
-            'nisn' => 'nullable|string|max:20',
+            'nisn' => 'nullable|string|max:20|unique:users,nisn',
             'tempat_lahir' => 'nullable|string|max:255',
             'tanggal_lahir' => 'nullable|date',
             'rt' => 'nullable|string|max:10',
@@ -125,7 +125,7 @@ class StudentController extends Controller
      */
     public function show(User $student)
     {
-        $student->load(['class', 'attendances']);
+        $student->load(['class', 'attendances', 'classHistories.class.homeroomTeacher', 'classHistories.academicYear']);
         
         // Statistik presensi
         $attendance_stats = [
@@ -133,6 +133,7 @@ class StudentController extends Controller
             'absent' => $student->attendances()->where('status', 'absent')->count(),
             'late' => $student->attendances()->where('status', 'late')->count(),
             'excused' => $student->attendances()->where('status', 'excused')->count(),
+            'sick' => $student->attendances()->where('status', 'sick')->count(),
         ];
         
         return view('admin.students.show', compact('student', 'attendance_stats'));
@@ -161,7 +162,7 @@ class StudentController extends Controller
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:500',
             'password' => 'nullable|string|min:6',
-            'nisn' => 'nullable|string|max:20',
+            'nisn' => 'nullable|string|max:20|unique:users,nisn,' . $student->id,
             'tempat_lahir' => 'nullable|string|max:255',
             'tanggal_lahir' => 'nullable|date',
             'rt' => 'nullable|string|max:10',

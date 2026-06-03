@@ -357,6 +357,12 @@ class StudentsImport implements ToCollection
                 continue;
             }
 
+            // Skip jika NISN sudah terdaftar (apabila diisi)
+            if (!empty($nisn) && User::where('nisn', $nisn)->exists()) {
+                $this->skippedCount++;
+                continue;
+            }
+
             // Tentukan ID kelas (Memprioritaskan Kelas Tujuan dari dropdown jika dipilih)
             $targetClassId = null;
             $classFromExcel = null;

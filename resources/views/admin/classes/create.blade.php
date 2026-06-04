@@ -30,6 +30,19 @@
                                placeholder="Contoh: XII IPA 1">
                         @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
+
+                    <!-- Jurusan -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Jurusan <span class="text-red-500">*</span></label>
+                        <select name="major" required
+                                class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm @error('major') border-red-500 @enderror">
+                            <option value="">Pilih Jurusan</option>
+                            @foreach(['Rekayasa Perangkat Lunak', 'Perfilman', 'Desain Komunikasi Visual', 'Manajemen Perkantoran', 'Desain dan Produksi Busana', 'Bisnis Digital', 'Akuntansi'] as $major)
+                                <option value="{{ $major }}" {{ old('major') == $major ? 'selected' : '' }}>{{ $major }}</option>
+                            @endforeach
+                        </select>
+                        @error('major') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
                     
                     <!-- Tingkat Kelas -->
                     <div>
@@ -71,9 +84,16 @@
                     <!-- Tahun Ajaran -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Tahun Ajaran <span class="text-red-500">*</span></label>
-                        <input type="text" name="academic_year" value="{{ old('academic_year', date('Y') . '/' . (date('Y')+1)) }}" required
-                               class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 transition-all text-sm"
-                               placeholder="Contoh: 2024/2025">
+                        <select name="academic_year" required
+                                class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 transition-all text-sm @error('academic_year') border-red-500 @enderror">
+                            <option value="">Pilih Tahun Ajaran</option>
+                            @foreach($academicYears as $year)
+                                <option value="{{ $year->name }}" {{ old('academic_year') == $year->name ? 'selected' : '' }}>
+                                    {{ $year->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('academic_year') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                 </div>

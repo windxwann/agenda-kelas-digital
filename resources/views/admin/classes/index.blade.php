@@ -1,6 +1,8 @@
 {{-- resources/views/admin/classes/index.blade.php --}}
 @extends('layouts.admin')
 
+@php $prefix = request()->segment(1); @endphp
+
 @section('title', 'Manajemen Kelas')
 @section('header', 'Manajemen Kelas')
 
@@ -12,7 +14,7 @@
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Data Kelas</h1>
             <p class="mt-2 text-base text-gray-500 max-w-2xl">Kelola pembagian kelas, wali kelas, dan kapasitas siswa.</p>
         </div>
-        <a href="{{ route('admin.classes.create') }}" 
+        <a href="{{ route($prefix . '.classes.create') }}" 
            class="inline-flex items-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl transition-all duration-200">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -23,7 +25,7 @@
 
     <!-- Filter & Search Section -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
-        <form method="GET" action="{{ route('admin.classes.index') }}" class="flex flex-col lg:flex-row gap-4">
+        <form method="GET" action="{{ route($prefix . '.classes.index') }}" class="flex flex-col lg:flex-row gap-4">
             <!-- Search Input -->
             <div class="relative flex-1">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -39,7 +41,7 @@
             <!-- Reset Button -->
             @if(request()->filled('search'))
                 <div class="flex items-center">
-                    <a href="{{ route('admin.classes.index') }}" 
+                    <a href="{{ route($prefix . '.classes.index') }}" 
                        class="inline-flex items-center justify-center px-4 py-3.5 text-sm font-semibold text-red-500 hover:bg-red-50 rounded-xl transition-all">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -101,18 +103,18 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <div class="flex space-x-3">
-                                    <a href="{{ route('admin.classes.show', $class) }}" class="text-gray-400 hover:text-blue-600 transition-colors">
+                                    <a href="{{ route($prefix . '.classes.show', $class) }}" class="text-gray-400 hover:text-blue-600 transition-colors">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                         </svg>
                                     </a>
-                                    <a href="{{ route('admin.classes.edit', $class) }}" class="text-gray-400 hover:text-green-600 transition-colors">
+                                    <a href="{{ route($prefix . '.classes.edit', $class) }}" class="text-gray-400 hover:text-green-600 transition-colors">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                         </svg>
                                     </a>
-                                    <form action="{{ route('admin.classes.destroy', $class) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus kelas ini?')">
+                                    <form action="{{ route($prefix . '.classes.destroy', $class) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus kelas ini?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="text-gray-400 hover:text-red-600 transition-colors">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,7 +133,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                                     </svg>
                                     <p class="text-lg font-medium">Belum ada data kelas</p>
-                                    <a href="{{ route('admin.classes.create') }}" class="mt-4 text-blue-600 hover:underline">Tambah kelas baru</a>
+                                    <a href="{{ route($prefix . '.classes.create') }}" class="mt-4 text-blue-600 hover:underline">Tambah kelas baru</a>
                                 </div>
                             </td>
                         </tr>

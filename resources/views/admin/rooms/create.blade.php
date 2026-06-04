@@ -21,7 +21,11 @@
                     </div>
                     <div class="space-y-2">
                         <label class="block text-sm font-bold text-gray-700">Tipe Ruangan</label>
-                        <input type="text" name="type" class="w-full p-4 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required placeholder="Contoh: Lab, Kelas, Aula">
+                        <select name="type" class="w-full p-4 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required>
+                            <option value="">Pilih Tipe Ruangan</option>
+                            <option value="Laboratorium">Laboratorium</option>
+                            <option value="Kelas">Kelas</option>
+                        </select>
                     </div>
                     <div class="space-y-2 col-span-2 md:col-span-1">
                         <label class="block text-sm font-bold text-gray-700">Kapasitas (Siswa)</label>

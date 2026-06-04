@@ -65,6 +65,9 @@ class ClassPromotionController extends Controller
         $sourceClass = Classes::findOrFail($sourceClassId);
         $targetClass = Classes::findOrFail($targetClassId);
         
+        // Simpan old homeroom ID untuk update role nantinya
+        $oldHomeroomId = $targetClass->homeroom_teacher_id;
+        
         if ($sourceClass->major !== $targetClass->major) {
             return redirect()->back()->with('error', 'Siswa tidak dapat dipindahkan ke kelas dengan jurusan yang berbeda!')->withInput();
         }
@@ -90,7 +93,7 @@ class ClassPromotionController extends Controller
         // Find or get the source academic year (the currently active one, which is the "before" year)
         $sourceYear = AcademicYear::where('is_active', true)->first();
 
-        DB::transaction(function () use ($studentIds, $sourceClassId, $targetClassId, $newHomeroomId, $targetYearId, $sourceYear) {
+        DB::transaction(function () use ($studentIds, $sourceClassId, $targetClassId, $newHomeroomId, $targetYearId, $sourceYear, $oldHomeroomId) {
             foreach ($studentIds as $studentId) {
                 // 1. Record history for the OLD (source) class if not already done
                 if ($sourceYear) {
@@ -114,9 +117,23 @@ class ClassPromotionController extends Controller
                 User::where('id', $studentId)->update(['class_id' => $targetClassId]);
             }
             
-            // 4. Optionally update homeroom teacher for the target class
-            if ($newHomeroomId) {
+            // 4. Update homeroom teacher for the target class and manage roles
+            if ($newHomeroomId && $newHomeroomId != $oldHomeroomId) {
                 Classes::where('id', $targetClassId)->update(['homeroom_teacher_id' => $newHomeroomId]);
+                
+                // Add role to new teacher
+                $newTeacher = User::find($newHomeroomId);
+                if ($newTeacher && !$newTeacher->hasRole('wali_kelas')) {
+                    $newTeacher->assignRole('wali_kelas');
+                }
+                
+                // Remove role from old teacher if they are no longer a homeroom teacher
+                if ($oldHomeroomId) {
+                    $oldTeacher = User::find($oldHomeroomId);
+                    if ($oldTeacher && !Classes::where('homeroom_teacher_id', $oldHomeroomId)->exists()) {
+                        $oldTeacher->removeRole('wali_kelas');
+                    }
+                }
             }
         });
 

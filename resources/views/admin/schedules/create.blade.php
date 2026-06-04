@@ -101,11 +101,12 @@
                     
                     <!-- Ruangan -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ruangan</label>
-                        <input type="text" name="room" value="{{ old('room') }}"
-                               class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm @error('room') border-red-500 @enderror"
-                               placeholder="Contoh: Ruang 101, Laboratorium Fisika, dll">
-                        @error('room') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ruangan <span class="text-red-500">*</span></label>
+                        <select name="room_id" id="room_id" required
+                                class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm @error('room_id') border-red-500 @enderror">
+                            <option value="">Pilih Ruangan</option>
+                        </select>
+                        @error('room_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
                 
@@ -119,7 +120,7 @@
                         <ul class="list-disc list-inside text-xs space-y-1 text-blue-700/80">
                             <li>Pastikan tidak ada jadwal yang bentrok di kelas yang sama pada jam yang sama.</li>
                             <li>Guru pengampu akan otomatis terisi berdasarkan mata pelajaran yang dipilih.</li>
-                            <li>Waktu (jam) selesai harus lebih besar dari jam mulai.</li>
+                            <li>Ruangan akan otomatis difilter berdasarkan ketersediaan pada waktu yang dipilih.</li>
                         </ul>
                     </div>
                 </div>
@@ -143,6 +144,41 @@
         if (teacherId) {
             document.getElementById('teacher_id').value = teacherId;
         }
+    });
+
+    // Dynamic Room Filter
+    const daySelect = document.getElementById('day');
+    const startTimeInput = document.querySelector('input[name="start_time"]');
+    const endTimeInput = document.querySelector('input[name="end_time"]');
+    const roomSelect = document.getElementById('room_id');
+
+    async function updateAvailableRooms() {
+        const day = daySelect.value;
+        const start = startTimeInput.value;
+        const end = endTimeInput.value;
+
+        roomSelect.innerHTML = '<option value="">Loading...</option>';
+
+        if (!day || !start || !end) {
+            roomSelect.innerHTML = '<option value="">Pilih Hari dan Jam Terlebih Dahulu</option>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`{{ route('admin.schedules.get-available-rooms') }}?day=${day}&start_time=${start}&end_time=${end}`);
+            const rooms = await response.json();
+
+            roomSelect.innerHTML = '<option value="">Pilih Ruangan</option>';
+            rooms.forEach(room => {
+                roomSelect.innerHTML += `<option value="${room.id}">${room.name}</option>`;
+            });
+        } catch (error) {
+            roomSelect.innerHTML = '<option value="">Gagal memuat ruangan</option>';
+        }
+    }
+
+    [daySelect, startTimeInput, endTimeInput].forEach(el => {
+        el.addEventListener('change', updateAvailableRooms);
     });
 </script>
 @endpush

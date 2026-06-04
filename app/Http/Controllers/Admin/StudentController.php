@@ -117,7 +117,7 @@ class StudentController extends Controller
 
         $prefix = $request->segment(1);
         return redirect()->route($prefix . '.students.index')
-            ->with('success', 'Siswa berhasil ditambahkan! Password: ' . $request->password);
+            ->with('success', 'Siswa berhasil ditambahkan!');
     }
 
     /**

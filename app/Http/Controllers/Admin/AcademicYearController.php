@@ -17,10 +17,17 @@ class AcademicYearController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->has('name')) {
+            $request->merge(['name' => ucwords(strtolower($request->name))]);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255|unique:academic_years',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+        ], [
+            'name.unique' => 'Tahun Ajaran ini sudah ada, silakan gunakan nama lain.',
+            'end_date.after_or_equal' => 'Tanggal Selesai harus sama atau setelah Tanggal Mulai.',
         ]);
 
         AcademicYear::create($request->all());
@@ -30,10 +37,17 @@ class AcademicYearController extends Controller
 
     public function update(Request $request, AcademicYear $academicYear)
     {
+        if ($request->has('name')) {
+            $request->merge(['name' => ucwords(strtolower($request->name))]);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255|unique:academic_years,name,' . $academicYear->id,
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+        ], [
+            'name.unique' => 'Tahun Ajaran ini sudah ada, silakan gunakan nama lain.',
+            'end_date.after_or_equal' => 'Tanggal Selesai harus sama atau setelah Tanggal Mulai.',
         ]);
 
         $academicYear->update($request->all());

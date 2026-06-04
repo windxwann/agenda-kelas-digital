@@ -77,7 +77,7 @@ class TeacherController extends Controller
 
         $prefix = $request->segment(1);
         return redirect()->route($prefix . '.teachers.index')
-            ->with('success', 'Guru berhasil ditambahkan! Password: ' . $request->password);
+            ->with('success', 'Guru berhasil ditambahkan!');
     }
 
     /**

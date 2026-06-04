@@ -28,6 +28,15 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('su
     // Manajemen Kelas
     Route::resource('classes', ClassController::class);
     
+    // Manajemen Tahun Ajaran
+    Route::resource('academic-years', \App\Http\Controllers\Admin\AcademicYearController::class)->except(['create', 'show', 'edit']);
+    Route::post('academic-years/{academic_year}/set-active', [\App\Http\Controllers\Admin\AcademicYearController::class, 'setActive'])->name('academic-years.set-active');
+    
+    // Kenaikan Kelas
+    Route::get('class-promotions', [\App\Http\Controllers\Admin\ClassPromotionController::class, 'index'])->name('class-promotions.index');
+    Route::get('class-promotions/preview', [\App\Http\Controllers\Admin\ClassPromotionController::class, 'preview'])->name('class-promotions.preview');
+    Route::post('class-promotions/promote', [\App\Http\Controllers\Admin\ClassPromotionController::class, 'promote'])->name('class-promotions.promote');
+    
     // Manajemen Siswa
     Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
     Route::get('students/export/template', [StudentController::class, 'exportTemplate'])->name('students.export.template');
@@ -46,6 +55,7 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('su
     
     // Manajemen Jadwal
     Route::resource('schedules', ScheduleController::class);
+    Route::get('schedules/get-available-rooms', [ScheduleController::class, 'getAvailableRooms'])->name('schedules.get-available-rooms');
     Route::get('schedules/class/{class}', [ScheduleController::class, 'byClass'])->name('schedules.byClass');
     
     // Manajemen Ruangan
@@ -115,6 +125,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     
     // Manajemen Jadwal
     Route::resource('schedules', ScheduleController::class);
+    Route::get('schedules/get-available-rooms', [ScheduleController::class, 'getAvailableRooms'])->name('schedules.get-available-rooms');
     
     // Manajemen Ruangan
     Route::resource('rooms', \App\Http\Controllers\Admin\RoomController::class);

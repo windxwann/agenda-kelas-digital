@@ -46,7 +46,9 @@ class ClassController extends Controller
             ->whereNotIn('id', $assignedTeacherIds)
             ->get();
             
-        return view('admin.classes.create', compact('teachers'));
+        $academicYears = \App\Models\AcademicYear::all();
+            
+        return view('admin.classes.create', compact('teachers', 'academicYears'));
     }
 
     /**
@@ -130,7 +132,9 @@ class ClassController extends Controller
             ->whereNotIn('id', $assignedTeacherIds)
             ->get();
             
-        return view('admin.classes.edit', compact('class', 'teachers'));
+        $academicYears = \App\Models\AcademicYear::all();
+            
+        return view('admin.classes.edit', compact('class', 'teachers', 'academicYears'));
     }
 
     /**

@@ -103,11 +103,17 @@
                     
                     <!-- Ruangan -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ruangan</label>
-                        <input type="text" name="room" value="{{ old('room', $schedule->room) }}"
-                               class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm @error('room') border-red-500 @enderror"
-                               placeholder="Contoh: Ruang 101, Laboratorium Fisika, dll">
-                        @error('room') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ruangan <span class="text-red-500">*</span></label>
+                        <select name="room_id" id="room_id" required
+                                class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm @error('room_id') border-red-500 @enderror">
+                            <option value="">Pilih Ruangan</option>
+                            @foreach($rooms as $room)
+                                <option value="{{ $room->id }}" {{ old('room_id', $schedule->room_id) == $room->id ? 'selected' : '' }}>
+                                    {{ $room->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('room_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
                 
@@ -136,6 +142,38 @@
         if (teacherId) {
             document.getElementById('teacher_id').value = teacherId;
         }
+    });
+
+    // Dynamic Room Filter
+    const daySelect = document.getElementById('day');
+    const startTimeInput = document.querySelector('input[name="start_time"]');
+    const endTimeInput = document.querySelector('input[name="end_time"]');
+    const roomSelect = document.getElementById('room_id');
+    const currentRoomId = "{{ $schedule->room_id }}";
+
+    async function updateAvailableRooms() {
+        const day = daySelect.value;
+        const start = startTimeInput.value;
+        const end = endTimeInput.value;
+
+        if (!day || !start || !end) return;
+
+        try {
+            const response = await fetch(`{{ route('admin.schedules.get-available-rooms') }}?day=${day}&start_time=${start}&end_time=${end}`);
+            const rooms = await response.json();
+
+            roomSelect.innerHTML = '<option value="">Pilih Ruangan</option>';
+            rooms.forEach(room => {
+                const isSelected = room.id == currentRoomId ? 'selected' : '';
+                roomSelect.innerHTML += `<option value="${room.id}" ${isSelected}>${room.name}</option>`;
+            });
+        } catch (error) {
+            console.error('Error loading rooms', error);
+        }
+    }
+
+    [daySelect, startTimeInput, endTimeInput].forEach(el => {
+        el.addEventListener('change', updateAvailableRooms);
     });
 </script>
 @endpush

@@ -9,13 +9,25 @@ use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AgendaController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request)
     {
         $user = Auth::user();
-        $classId = $user->class_id;
+        $academicYearId = $request->query('academic_year_id');
+        if (!$academicYearId) {
+            $activeYear = AcademicYear::where('is_active', true)->first();
+            $academicYearId = $activeYear ? $activeYear->id : null;
+        }
+
+        $class = null;
+        if ($academicYearId) {
+            $class = $user->getClassInAcademicYear($academicYearId);
+        }
+        $classId = $class ? $class->id : $user->class_id;
 
         $query = Agenda::where('class_id', $classId)
             ->with(['teacher', 'subject', 'class']);

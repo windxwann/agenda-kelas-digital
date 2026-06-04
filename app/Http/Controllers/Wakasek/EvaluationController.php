@@ -11,30 +11,43 @@ use App\Models\Attendance;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class EvaluationController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
+        $this->authorize('view', User::class);
+
         // 1. General Stats
         $totalTeachers = User::role('teacher')->count();
         $totalStudents = User::role('siswa')->count();
         $totalJournals = Agenda::count();
         
         // 2. Attendance Summary by Class (Percentage)
-        $classAttendance = Classes::withCount(['students', 'attendances' => function($q) {
-            $q->whereIn('status', ['present', 'late']);
-        }])->get()->map(function($class) {
-            $totalExpected = $class->students_count > 0 ? ($class->students_count * Attendance::whereHas('student', function($s) use ($class) { $s->where('class_id', $class->id); })->distinct('date')->count()) : 0;
-            $presentCount = $class->attendances_count;
-            
-            return [
-                'id' => $class->id,
-                'name' => $class->name,
-                'percentage' => $totalExpected > 0 ? round(($presentCount / $totalExpected) * 100, 1) : 0,
-                'present' => $presentCount
-            ];
-        })->sortByDesc('percentage');
+        $classAttendance = Classes::query()
+            ->with(['students'])
+            ->withCount(['attendances' => function($q) {
+                $q->whereIn('status', ['present', 'late']);
+            }])
+            ->get()
+            ->map(function($class) {
+                // Simplified count logic: Count unique dates where attendance was taken for this class
+                $distinctDatesCount = Attendance::whereHas('student', function($s) use ($class) {
+                    $s->where('class_id', $class->id);
+                })->distinct('date')->count('date');
+
+                $totalExpected = ($class->students->count() * $distinctDatesCount);
+                $presentCount = $class->attendances_count;
+
+                return [
+                    'id' => $class->id,
+                    'name' => $class->name,
+                    'percentage' => $totalExpected > 0 ? round(($presentCount / $totalExpected) * 100, 1) : 0,
+                    'present' => $presentCount
+                ];
+            })->sortByDesc('percentage');
 
         // 3. Absence Trends (Current Month)
         $absenceStats = Attendance::where('date', '>=', now()->startOfMonth())
@@ -57,6 +70,8 @@ class EvaluationController extends Controller
 
     public function report()
     {
+        $this->authorize('view', User::class);
+
         return view('wakasek.evaluation.report');
     }
 }

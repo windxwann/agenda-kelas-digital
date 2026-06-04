@@ -122,7 +122,7 @@
             @csrf
             <div>
                 <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Nama Tahun Ajaran</label>
-                <input type="text" name="name" required placeholder="Contoh: 2023/2024 Ganjil" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+                <input type="text" name="name" required placeholder="Contoh: 2023/2024" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>

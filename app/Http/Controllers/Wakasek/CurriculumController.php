@@ -8,11 +8,15 @@ use Illuminate\Http\Request;
 use App\Models\Classes;
 use App\Models\Subject;
 use App\Models\Agenda;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CurriculumController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
+        $this->authorize('view', \App\Models\User::class);
+
         $classQuery = Classes::withCount('agendas');
         $subjectQuery = Subject::withCount('agendas');
         
@@ -29,6 +33,8 @@ class CurriculumController extends Controller
 
     public function progress()
     {
+        $this->authorize('view', \App\Models\User::class);
+
         // Detail progress per mapel per kelas
         $query = Agenda::select('class_id', 'subject_id', \DB::raw('count(*) as total'))
             ->with(['class', 'subject']);

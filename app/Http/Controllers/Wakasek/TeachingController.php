@@ -7,11 +7,15 @@ use Illuminate\Http\Request;
 
 use App\Models\User;
 use App\Models\Agenda;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TeachingController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
+        $this->authorize('view', User::class);
+
         $query = User::role('teacher')->withCount('agendas');
         
         if (request('q')) {
@@ -28,6 +32,8 @@ class TeachingController extends Controller
 
     public function show(User $teacher)
     {
+        $this->authorize('view', User::class);
+
         $query = Agenda::where('teacher_id', $teacher->id)
             ->with(['class', 'subject']);
             

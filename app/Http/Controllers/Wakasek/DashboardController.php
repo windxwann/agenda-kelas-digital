@@ -10,11 +10,15 @@ use App\Models\Agenda;
 use App\Models\Classes;
 use App\Models\Subject;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class DashboardController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
+        $this->authorize('view', User::class);
+
         $total_teachers = User::role('teacher')->count();
         $total_classes = Classes::count();
         $total_subjects = Subject::count();

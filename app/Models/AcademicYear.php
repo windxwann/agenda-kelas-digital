@@ -16,6 +16,13 @@ class AcademicYear extends Model
         'is_active',
     ];
 
+    // Accessor untuk mendapatkan semester secara otomatis
+    public function getSemesterAttribute()
+    {
+        $month = now()->month;
+        return ($month >= 7 && $month <= 12) ? 'Ganjil' : 'Genap';
+    }
+
     protected $casts = [
         'is_active' => 'boolean',
         'start_date' => 'date',

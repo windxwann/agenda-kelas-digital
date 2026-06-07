@@ -202,6 +202,8 @@ class ClassController extends Controller
             ->with('success', 'Kelas berhasil diperbarui!');
     }
 
+
+
     /**
      * Remove the specified resource from storage.
      */

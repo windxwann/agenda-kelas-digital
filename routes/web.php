@@ -54,9 +54,9 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('su
     Route::resource('subjects', SubjectController::class);
     
     // Manajemen Jadwal
-    Route::resource('schedules', ScheduleController::class);
     Route::get('schedules/get-available-rooms', [ScheduleController::class, 'getAvailableRooms'])->name('schedules.get-available-rooms');
     Route::get('schedules/class/{class}', [ScheduleController::class, 'byClass'])->name('schedules.byClass');
+    Route::resource('schedules', ScheduleController::class);
     
     // Manajemen Ruangan
     Route::resource('rooms', \App\Http\Controllers\Admin\RoomController::class);
@@ -124,8 +124,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('subjects', SubjectController::class);
     
     // Manajemen Jadwal
-    Route::resource('schedules', ScheduleController::class);
     Route::get('schedules/get-available-rooms', [ScheduleController::class, 'getAvailableRooms'])->name('schedules.get-available-rooms');
+    Route::resource('schedules', ScheduleController::class);
     
     // Manajemen Ruangan
     Route::resource('rooms', \App\Http\Controllers\Admin\RoomController::class);
@@ -213,7 +213,7 @@ Route::middleware(['auth', 'role:wali_kelas'])->prefix('wali-kelas')->name('wali
 });
 
 // Wakasek Kurikulum Routes
-Route::middleware(['auth', 'role:wakasek_kurikulum'])->prefix('wakasek-kurikulum')->name('wakasek-kurikulum.')->group(function () {
+Route::middleware(['auth', 'role:wakasek_kurikulum|super_admin'])->prefix('wakasek-kurikulum')->name('wakasek-kurikulum.')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\Wakasek\DashboardController::class, 'index'])->name('dashboard');
     
     // Monitoring Kurikulum

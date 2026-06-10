@@ -30,7 +30,7 @@ class Schedule extends Model
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    public function room()
+    public function room_model()
     {
         return $this->belongsTo(Room::class, 'room_id');
     }

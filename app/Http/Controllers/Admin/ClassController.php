@@ -28,7 +28,7 @@ class ClassController extends Controller
             });
         }
 
-        $classList = $query->latest()->paginate(10);
+        $classList = $query->orderBy('academic_year', 'desc')->orderBy('name', 'asc')->paginate(10);
             
         return view('admin.classes.index', compact('classList'));
     }

@@ -76,7 +76,7 @@
                         </div>
                         <div class="flex justify-between items-center py-2 border-b border-gray-50">
                             <span class="text-xs font-semibold text-gray-500 uppercase">Ruangan</span>
-                            <span class="text-sm font-medium text-gray-900">{{ $schedule->room ?? '-' }}</span>
+                            <span class="text-sm font-medium text-gray-900">{{ $schedule->room_model ? $schedule->room_model->name : ($schedule->room ?? '-') }}</span>
                         </div>
                     </div>
 

@@ -16,7 +16,7 @@ class ScheduleController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Schedule::with(['class', 'subject', 'teacher', 'room']);
+        $query = Schedule::with(['class', 'subject', 'teacher', 'room_model']);
         
         if ($request->has('class_id') && $request->class_id) {
             $query->where('class_id', $request->class_id);
@@ -72,6 +72,12 @@ class ScheduleController extends Controller
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
         
         return view('admin.schedules.create', compact('classList', 'subjects', 'teachers', 'rooms', 'days'));
+    }
+
+    public function show(Schedule $schedule)
+    {
+        $schedule->load(['class', 'subject', 'teacher', 'room_model']);
+        return view('admin.schedules.show', compact('schedule'));
     }
 
     public function store(Request $request)
@@ -223,7 +229,7 @@ class ScheduleController extends Controller
 
     public function byClass(Classes $class)
     {
-        $schedules = Schedule::with(['subject', 'teacher', 'room'])
+        $schedules = Schedule::with(['subject', 'teacher', 'room_model'])
             ->where('class_id', $class->id)
             ->orderBy('day')
             ->orderBy('start_time')

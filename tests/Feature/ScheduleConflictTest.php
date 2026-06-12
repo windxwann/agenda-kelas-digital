@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Classes;
 use App\Models\Subject;
 use App\Models\Schedule;
+use App\Models\Room;
 
 class ScheduleConflictTest extends TestCase
 {
@@ -19,6 +20,8 @@ class ScheduleConflictTest extends TestCase
     protected $class2;
     protected $subject1;
     protected $subject2;
+    protected $room1;
+    protected $room2;
 
     protected function setUp(): void
     {
@@ -38,6 +41,9 @@ class ScheduleConflictTest extends TestCase
 
         // Clear default seeded schedules to start clean
         Schedule::truncate();
+
+        $this->room1 = Room::create(['name' => 'Lab 101', 'type' => 'laboratorium', 'capacity' => 36, 'is_active' => true]);
+        $this->room2 = Room::create(['name' => 'Lab 102', 'type' => 'laboratorium', 'capacity' => 36, 'is_active' => true]);
     }
 
     /**
@@ -53,7 +59,7 @@ class ScheduleConflictTest extends TestCase
                 'day' => 'Monday',
                 'start_time' => '08:00',
                 'end_time' => '09:30',
-                'room' => 'Lab 101',
+                'room_id' => $this->room1->id,
             ]);
 
         $response->assertRedirect('/admin/schedules');
@@ -64,7 +70,7 @@ class ScheduleConflictTest extends TestCase
             'day' => 'Monday',
             'start_time' => '08:00',
             'end_time' => '09:30',
-            'room' => 'Lab 101',
+            'room_id' => $this->room1->id,
         ]);
     }
 
@@ -81,7 +87,7 @@ class ScheduleConflictTest extends TestCase
             'day' => 'Monday',
             'start_time' => '08:00:00',
             'end_time' => '09:30:00',
-            'room' => 'Lab 101',
+            'room_id' => $this->room1->id,
         ]);
 
         // Attempt to create another schedule for the same class at overlapping time (08:30 - 10:00)
@@ -94,7 +100,7 @@ class ScheduleConflictTest extends TestCase
                 'day' => 'Monday',
                 'start_time' => '08:30',
                 'end_time' => '10:00',
-                'room' => 'Lab 102',
+                'room_id' => $this->room2->id,
             ]);
 
         $response->assertRedirect('/admin/schedules/create');
@@ -117,7 +123,7 @@ class ScheduleConflictTest extends TestCase
             'day' => 'Monday',
             'start_time' => '08:00:00',
             'end_time' => '09:30:00',
-            'room' => 'Lab 101',
+            'room_id' => $this->room1->id,
         ]);
 
         // Attempt to assign the same teacher to Class 2 at an overlapping time (09:00 - 10:30)
@@ -130,7 +136,7 @@ class ScheduleConflictTest extends TestCase
                 'day' => 'Monday',
                 'start_time' => '09:00',
                 'end_time' => '10:30',
-                'room' => 'Lab 102',
+                'room_id' => $this->room2->id,
             ]);
 
         $response->assertRedirect('/admin/schedules/create');
@@ -153,7 +159,7 @@ class ScheduleConflictTest extends TestCase
             'day' => 'Monday',
             'start_time' => '08:00:00',
             'end_time' => '09:30:00',
-            'room' => 'Lab 101',
+            'room_id' => $this->room1->id,
         ]);
 
         // Create another teacher to avoid teacher conflict
@@ -170,7 +176,7 @@ class ScheduleConflictTest extends TestCase
                 'day' => 'Monday',
                 'start_time' => '09:00',
                 'end_time' => '10:30',
-                'room' => 'Lab 101',
+                'room_id' => $this->room1->id,
             ]);
 
         $response->assertRedirect('/admin/schedules/create');
@@ -193,7 +199,7 @@ class ScheduleConflictTest extends TestCase
             'day' => 'Monday',
             'start_time' => '08:00:00',
             'end_time' => '09:30:00',
-            'room' => 'Lab 101',
+            'room_id' => $this->room1->id,
         ]);
 
         // Attempt to create schedule 2 (09:30 - 11:00) with same teacher and room (back to back)
@@ -205,7 +211,7 @@ class ScheduleConflictTest extends TestCase
                 'day' => 'Monday',
                 'start_time' => '09:30',
                 'end_time' => '11:00',
-                'room' => 'Lab 101',
+                'room_id' => $this->room1->id,
             ]);
 
         $response->assertRedirect('/admin/schedules');

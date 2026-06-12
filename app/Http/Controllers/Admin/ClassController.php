@@ -6,9 +6,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Classes;
 use App\Models\User;
+use App\Http\Requests\StoreClassRequest;
+use App\Http\Requests\UpdateClassRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 class ClassController extends Controller
 {
@@ -65,39 +65,9 @@ class ClassController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreClassRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('classes')->where(function ($query) use ($request) {
-                    return $query->where('grade_level', $request->grade_level)
-                                 ->where('academic_year', $request->academic_year);
-                })
-            ],
-            'major' => 'required|string|max:255',
-            'grade_level' => 'required|in:X,XI,XII',
-            'academic_year' => 'required|string',
-            'homeroom_teacher_id' => [
-                'nullable',
-                'exists:users,id',
-                Rule::unique('classes')->where(function ($query) {
-                    return $query->where('is_active', true);
-                })
-            ],
-            'capacity' => 'required|integer|min:1|max:50',
-            'description' => 'nullable|string|max:500'
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        Classes::create($request->all());
+        Classes::create($request->validated());
 
         // Assign wali_kelas role to the teacher
         if ($request->homeroom_teacher_id) {
@@ -151,50 +121,22 @@ class ClassController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $class)
+    public function update(UpdateClassRequest $request, $class)
     {
         if (!$class instanceof Classes) {
             $class = Classes::findOrFail($class);
         }
-        $validator = Validator::make($request->all(), [
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('classes')->where(function ($query) use ($request) {
-                    return $query->where('grade_level', $request->grade_level)
-                                 ->where('academic_year', $request->academic_year);
-                })->ignore($class->id)
-            ],
-            'major' => 'required|string|max:255',
-            'grade_level' => 'required|in:X,XI,XII',
-            'academic_year' => 'required|string',
-            'homeroom_teacher_id' => [
-                'nullable',
-                'exists:users,id',
-                Rule::unique('classes')->where(function ($query) {
-                    return $query->where('is_active', true);
-                })->ignore($class->id)
-            ],
-            'capacity' => 'required|integer|min:1|max:50',
-            'description' => 'nullable|string|max:500'
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
 
         $oldTeacherId = $class->homeroom_teacher_id;
-        $class->update($request->all());
+        $class->update($request->validated());
 
         // Handle role changes
         if ($oldTeacherId != $request->homeroom_teacher_id) {
             // Remove role from old teacher if they are no longer a homeroom teacher for any class
             if ($oldTeacherId) {
                 $oldTeacher = User::find($oldTeacherId);
-                if ($oldTeacher && !Classes::where('homeroom_teacher_id', $oldTeacherId)->exists()) {
+                // Check if the old teacher is a homeroom teacher for any OTHER active class
+                if ($oldTeacher && !Classes::where('homeroom_teacher_id', $oldTeacherId)->where('id', '!=', $class->id)->exists()) {
                     $oldTeacher->removeRole('wali_kelas');
                 }
             }

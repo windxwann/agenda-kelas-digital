@@ -20,63 +20,62 @@
     </div>
 
     <!-- Action Toolbar Card -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-        <!-- Left Side: Descriptive Icon & Title -->
-        <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm border border-blue-100">
-                <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <!-- Title Row -->
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100 flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
                 </svg>
             </div>
-            <div>
+            <div class="min-w-0">
                 <h3 class="text-sm font-bold text-gray-800">Menu Tindakan & Operasi Data</h3>
-                <p class="text-xs text-gray-400 mt-0.5">Impor, ekspor, kelola kelulusan, atau tambah data baru di sini</p>
+                <p class="text-xs text-gray-400 mt-0.5 hidden sm:block">Impor, ekspor, kelola kelulusan, atau tambah data baru di sini</p>
             </div>
         </div>
-        
-        <!-- Right Side: Unified Action Buttons -->
-        <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto lg:justify-end">
-            <!-- Import & Template Group -->
-            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-xl p-1 shadow-sm hover:border-gray-300 transition-all duration-200">
-                <button onclick="openImportModal()" 
-                        class="inline-flex items-center px-4 py-2 text-xs font-bold text-gray-600 rounded-lg hover:bg-white hover:text-gray-900 transition-all duration-200">
-                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                    </svg>
-                    Import
-                </button>
-                <div class="w-px h-5 bg-gray-200 mx-0.5"></div>
-                <a href="{{ route('admin.students.export.template') }}" 
-                   class="inline-flex items-center px-4 py-2 text-xs font-bold text-gray-600 rounded-lg hover:bg-white hover:text-gray-900 transition-all duration-200">
-                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
-                    </svg>
-                    Template
-                </a>
-            </div>
 
-            <!-- Pilih Massal Button -->
-            <button id="btn-toggle-select" onclick="toggleSelectMode()" 
-               class="inline-flex items-center px-4 py-2.5 text-xs font-bold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all duration-200 shadow-sm">
-                <svg class="w-4 h-4 mr-2 text-gray-400 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Action Buttons: 2x2 grid on mobile, row on desktop -->
+        <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3">
+            <!-- Import -->
+            <button onclick="openImportModal()"
+                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-white hover:text-gray-900 hover:border-gray-300 transition-all duration-200 shadow-sm">
+                <svg class="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                Import Excel
+            </button>
+
+            <!-- Template -->
+            <a href="{{ route('admin.students.export.template') }}"
+               class="inline-flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-white hover:text-gray-900 hover:border-gray-300 transition-all duration-200 shadow-sm">
+                <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+                </svg>
+                Template
+            </a>
+
+            <!-- Pilih Massal -->
+            <button id="btn-toggle-select" onclick="toggleSelectMode()"
+               class="inline-flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-200 shadow-sm">
+                <svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                 </svg>
                 <span id="toggle-select-text">Pilih Massal</span>
             </button>
 
-            <!-- Kelulusan Massal Button -->
-            <a href="{{ route(request()->segment(1) . '.students.bulk-graduation') }}" 
-               class="inline-flex items-center px-4 py-2.5 text-xs font-bold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 transition-all duration-200 shadow-sm">
-                <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Kelulusan Massal -->
+            <a href="{{ route(request()->segment(1) . '.students.bulk-graduation') }}"
+               class="inline-flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all duration-200 shadow-sm">
+                <svg class="w-4 h-4 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
-                Kelulusan Massal
+                Kelulusan
             </a>
 
-            <!-- Tambah Siswa Button -->
-            <a href="{{ route('admin.students.create') }}" 
-               class="inline-flex items-center px-5 py-2.5 text-xs font-black text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-md shadow-blue-500/10 hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-200">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Tambah Siswa: full-width on mobile, auto on desktop -->
+            <a href="{{ route('admin.students.create') }}"
+               class="col-span-2 sm:col-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-black text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-md shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
                 Tambah Siswa
@@ -85,54 +84,54 @@
     </div>
     
     <!-- Statistik Cepat -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-2">
-        <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 group hover:border-blue-500 transition-all duration-300">
+    <div class="grid grid-cols-2 gap-4 mb-2">
+        <div class="bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100 group hover:border-blue-500 transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Siswa</p>
-                    <p class="text-3xl font-black text-gray-900 mt-1">{{ $students->total() }}</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Siswa</p>
+                    <p class="text-2xl sm:text-3xl font-black text-gray-900 mt-1">{{ $students->total() }}</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 group hover:border-green-500 transition-all duration-300">
+        <div class="bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100 group hover:border-green-500 transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Kelas</p>
-                    <p class="text-3xl font-black text-gray-900 mt-1">{{ is_countable($classList) ? count($classList) : 0 }}</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Kelas</p>
+                    <p class="text-2xl sm:text-3xl font-black text-gray-900 mt-1">{{ is_countable($classList) ? count($classList) : 0 }}</p>
                 </div>
-                <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 group hover:border-amber-500 transition-all duration-300">
+        <div class="bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100 group hover:border-amber-500 transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Laki-laki</p>
-                    <p class="text-3xl font-black text-gray-900 mt-1">{{ $maleCount ?? 0 }}</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">Laki-laki</p>
+                    <p class="text-2xl sm:text-3xl font-black text-gray-900 mt-1">{{ $maleCount ?? 0 }}</p>
                 </div>
-                <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 group hover:border-purple-500 transition-all duration-300">
+        <div class="bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100 group hover:border-purple-500 transition-all duration-300">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Perempuan</p>
-                    <p class="text-3xl font-black text-gray-900 mt-1">{{ $femaleCount ?? 0 }}</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">Perempuan</p>
+                    <p class="text-2xl sm:text-3xl font-black text-gray-900 mt-1">{{ $femaleCount ?? 0 }}</p>
                 </div>
-                <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
                 </div>
@@ -155,10 +154,10 @@
                        class="block w-full pl-12 pr-4 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
             </div>
 
-            <!-- Dropdown Filters Group -->
-            <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
-                <!-- Filter Kelas -->
-                <div class="relative w-full sm:w-48">
+            <!-- Dropdown Filters Grid: 2 col on mobile, row on desktop -->
+            <div class="grid grid-cols-2 sm:flex sm:flex-nowrap items-center gap-2 sm:gap-3">
+                <!-- Filter Kelas: spans full row on mobile -->
+                <div class="relative col-span-2 sm:col-auto sm:w-48">
                     <select name="class_id" onchange="this.form.submit()" 
                             class="appearance-none block w-full pl-4 pr-10 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
                         <option value="">Semua Kelas</option>
@@ -174,7 +173,7 @@
                 </div>
 
                 <!-- Filter Gender -->
-                <div class="relative w-full sm:w-40">
+                <div class="relative sm:w-40">
                     <select name="gender" onchange="this.form.submit()" 
                             class="appearance-none block w-full pl-4 pr-10 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
                         <option value="">Gender</option>
@@ -187,7 +186,7 @@
                 </div>
 
                 <!-- Filter Status -->
-                <div class="relative w-full sm:w-40">
+                <div class="relative sm:w-40">
                     <select name="status" onchange="this.form.submit()" 
                             class="appearance-none block w-full pl-4 pr-10 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
                         <option value="">Status</option>
@@ -201,7 +200,7 @@
                 </div>
 
                 <!-- Per Page Selector -->
-                <div class="relative w-full sm:w-32">
+                <div class="relative sm:w-32">
                     <select name="per_page" onchange="this.form.submit()" 
                             class="appearance-none block w-full pl-4 pr-10 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
                         <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10/hal</option>
@@ -217,11 +216,12 @@
                 <!-- Reset Button -->
                 @if(request()->anyFilled(['search', 'class_id', 'gender', 'status']))
                     <a href="{{ route('admin.students.index') }}" 
-                       class="inline-flex items-center justify-center p-3 text-red-500 hover:bg-red-50 rounded-xl transition-all" 
+                       class="col-span-2 sm:col-auto inline-flex items-center justify-center gap-2 py-3 px-4 text-sm font-bold text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-all"
                        title="Reset Filter">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
+                        <span class="sm:hidden">Reset Filter</span>
                     </a>
                 @endif
             </div>

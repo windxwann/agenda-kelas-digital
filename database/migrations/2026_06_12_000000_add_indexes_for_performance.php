@@ -13,11 +13,6 @@ return new class extends Migration
     {
         // Add indexes to users table for better query performance
         Schema::table('users', function (Blueprint $table) {
-            // Index for role-based queries
-            if (!$this->hasIndex('users', 'users_role_index')) {
-                // Note: Spatie permissions uses model_has_role table, but we can index common fields
-            }
-            
             // Index for student searches
             $table->index('nis', 'users_nis_index');
             $table->index('nisn', 'users_nisn_index');
@@ -90,15 +85,5 @@ return new class extends Migration
             $table->dropIndex('agendas_date_index');
             $table->dropIndex('agendas_teacher_date_index');
         });
-    }
-    
-    /**
-     * Check if index exists
-     */
-    private function hasIndex($table, $indexName): bool
-    {
-        $schemaManager = Schema::getConnection()->getDoctrineSchemaManager();
-        $indexes = $schemaManager->listTableIndexes($table);
-        return isset($indexes[$indexName]);
     }
 };

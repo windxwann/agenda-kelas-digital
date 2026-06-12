@@ -18,7 +18,7 @@ class AcademicYearController extends Controller
     public function store(Request $request)
     {
         if ($request->has('name')) {
-            $request->merge(['name' => ucwords(strtolower($request->name))]);
+            $request->merge(['name' => trim($request->name)]);
         }
 
         $request->validate([
@@ -38,7 +38,7 @@ class AcademicYearController extends Controller
     public function update(Request $request, AcademicYear $academicYear)
     {
         if ($request->has('name')) {
-            $request->merge(['name' => ucwords(strtolower($request->name))]);
+            $request->merge(['name' => trim($request->name)]);
         }
 
         $request->validate([

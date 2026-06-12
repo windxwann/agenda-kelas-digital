@@ -38,7 +38,7 @@
     </div>
     
     <!-- Stats Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+    <div class="grid grid-cols-2 gap-3 sm:gap-6">
         <div class="bg-white rounded-[2rem] shadow-sm p-5 sm:p-6 border border-gray-100 group hover:border-blue-500 transition-all duration-300">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>

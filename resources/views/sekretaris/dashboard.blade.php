@@ -27,7 +27,7 @@
     </div>
 
     {{-- Quick Stats --}}
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 gap-4">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Agenda</p>
             <p class="text-2xl font-black text-gray-900 mt-1">{{ $stats['total_agendas'] }}</p>

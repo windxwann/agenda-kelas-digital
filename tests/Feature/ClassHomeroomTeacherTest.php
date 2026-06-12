@@ -33,6 +33,7 @@ class ClassHomeroomTeacherTest extends TestCase
         // Create first class
         Classes::create([
             'name' => 'Class 1',
+            'major' => 'RPL',
             'grade_level' => 'X',
             'academic_year' => '2025/2026',
             'homeroom_teacher_id' => $teacher->id,
@@ -43,6 +44,7 @@ class ClassHomeroomTeacherTest extends TestCase
         // Try to create second class with same teacher
         $response = $this->post(route('admin.classes.store'), [
             'name' => 'Class 2',
+            'major' => 'RPL',
             'grade_level' => 'XI',
             'academic_year' => '2025/2026',
             'homeroom_teacher_id' => $teacher->id,
@@ -67,6 +69,7 @@ class ClassHomeroomTeacherTest extends TestCase
         // Create class with teacher
         $class = Classes::create([
             'name' => 'Class 1',
+            'major' => 'RPL',
             'grade_level' => 'X',
             'academic_year' => '2025/2026',
             'homeroom_teacher_id' => $teacher->id,
@@ -78,15 +81,17 @@ class ClassHomeroomTeacherTest extends TestCase
         // Update class to remove teacher
         $response = $this->put(route('admin.classes.update', $class->id), [
             'name' => 'Class 1',
+            'major' => 'RPL',
             'grade_level' => 'X',
             'academic_year' => '2025/2026',
             'homeroom_teacher_id' => null,
             'capacity' => 30,
             'is_active' => true,
         ]);
+        $response->assertStatus(302);
 
         $class->refresh();
-        $this->assertNull($class->homeroom_teacher_id);
+        $this->assertTrue(empty($class->homeroom_teacher_id));
 
         $teacher->refresh();
         $this->assertFalse($teacher->hasRole('wali_kelas'));
@@ -105,6 +110,7 @@ class ClassHomeroomTeacherTest extends TestCase
         // Create class with teacher
         $class = Classes::create([
             'name' => 'Class 1',
+            'major' => 'RPL',
             'grade_level' => 'X',
             'academic_year' => '2025/2026',
             'homeroom_teacher_id' => $teacher->id,

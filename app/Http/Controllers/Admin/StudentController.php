@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\StudentsImport;
 use App\Exports\StudentsTemplateExport;
@@ -131,6 +132,9 @@ class StudentController extends Controller
         
         $student->assignRole('siswa');
 
+        Cache::forget('stats_male_students');
+        Cache::forget('stats_female_students');
+
         $prefix = $request->segment(1);
         return redirect()->route($prefix . '.students.index')
             ->with('success', 'Siswa berhasil ditambahkan!');
@@ -213,6 +217,9 @@ class StudentController extends Controller
             }
         }
 
+        Cache::forget('stats_male_students');
+        Cache::forget('stats_female_students');
+
         $message = 'Siswa berhasil diperbarui!';
         if ($request->filled('password')) {
             $message .= ' Password baru: ' . $request->password;
@@ -230,6 +237,9 @@ class StudentController extends Controller
     {
         $student->delete();
         
+        Cache::forget('stats_male_students');
+        Cache::forget('stats_female_students');
+
         $prefix = request()->segment(1);
         return redirect()->route($prefix . '.students.index')
             ->with('success', 'Siswa berhasil dihapus!');
@@ -256,6 +266,9 @@ class StudentController extends Controller
                 $importedCount = $import->getImportedCount();
                 $skippedCount = $import->getSkippedCount();
             });
+            
+            Cache::forget('stats_male_students');
+            Cache::forget('stats_female_students');
             
             $message = "Data siswa berhasil diimport! Berhasil menyimpan {$importedCount} siswa.";
             if ($skippedCount > 0) {
@@ -335,6 +348,9 @@ class StudentController extends Controller
             $student->removeRole('siswa');
             $student->delete();
         }
+
+        Cache::forget('stats_male_students');
+        Cache::forget('stats_female_students');
 
         $prefix = $request->segment(1);
         return redirect()->route($prefix . '.students.index')

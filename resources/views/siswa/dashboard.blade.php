@@ -37,7 +37,7 @@
     </div>
 
     {{-- Stats Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
+    <div class="grid grid-cols-2 gap-4">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:border-gray-200 transition-all">
             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total</p>
             <p class="text-2xl font-black text-gray-900">{{ $attendance_stats['total'] }}</p>

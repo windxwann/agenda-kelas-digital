@@ -11,7 +11,10 @@ class RoomController extends Controller
     public function index()
     {
         $rooms = Room::all();
-        return view('admin.rooms.index', compact('rooms'));
+        $totalRooms = $rooms->count();
+        $roomsByType = $rooms->groupBy('type')->map->count();
+        
+        return view('admin.rooms.index', compact('rooms', 'totalRooms', 'roomsByType'));
     }
 
     public function create()
@@ -22,7 +25,7 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:rooms,name',
             'type' => 'required|string|max:50',
             'capacity' => 'nullable|integer',
         ]);
@@ -39,7 +42,7 @@ class RoomController extends Controller
     public function update(Request $request, Room $room)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:rooms,name,' . $room->id,
             'type' => 'required|string|max:50',
             'capacity' => 'nullable|integer',
         ]);

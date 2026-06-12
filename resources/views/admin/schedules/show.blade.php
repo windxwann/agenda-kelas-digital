@@ -114,7 +114,7 @@
                         // Time slots sesuai dengan PDF (45 menit per sesi, dengan break 12:00-12:45 untuk istirahat)
                         $timeSlots = [
                             '06:30', '07:15', '08:00', '08:45', '09:30','09:45', '10:30', '11:15','12:00',
-                            '12:45', '13:30', '14:15', '15:00','15:45'
+                            '12:45', '13:30','14:00', '14:15', '15:00','15:45'
                         ];
                         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
                     @endphp

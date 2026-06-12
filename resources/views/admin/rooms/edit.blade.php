@@ -17,18 +17,27 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-2">
                         <label class="block text-sm font-bold text-gray-700">Nama Ruangan</label>
-                        <input type="text" name="name" value="{{ $room->name }}" class="w-full p-4 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required>
+                        <input type="text" name="name" value="{{ old('name', $room->name) }}" class="w-full p-4 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all @error('name') border-red-500 ring-2 ring-red-500 @enderror" required>
+                        @error('name')
+                            <p class="text-red-500 text-xs font-bold mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="space-y-2">
                         <label class="block text-sm font-bold text-gray-700">Tipe Ruangan</label>
-                        <select name="type" class="w-full p-4 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required>
-                            <option value="Laboratorium" {{ $room->type == 'Laboratorium' ? 'selected' : '' }}>Laboratorium</option>
-                            <option value="Kelas" {{ $room->type == 'Kelas' ? 'selected' : '' }}>Kelas</option>
+                        <select name="type" class="w-full p-4 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all @error('type') border-red-500 ring-2 ring-red-500 @enderror" required>
+                            <option value="Laboratorium" {{ old('type', $room->type) == 'Laboratorium' ? 'selected' : '' }}>Laboratorium</option>
+                            <option value="Kelas" {{ old('type', $room->type) == 'Kelas' ? 'selected' : '' }}>Kelas</option>
                         </select>
+                        @error('type')
+                            <p class="text-red-500 text-xs font-bold mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="space-y-2 col-span-2 md:col-span-1">
                         <label class="block text-sm font-bold text-gray-700">Kapasitas (Siswa)</label>
-                        <input type="number" name="capacity" value="{{ $room->capacity }}" class="w-full p-4 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <input type="number" name="capacity" value="{{ old('capacity', $room->capacity) }}" class="w-full p-4 bg-gray-50 rounded-2xl border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all @error('capacity') border-red-500 ring-2 ring-red-500 @enderror">
+                        @error('capacity')
+                            <p class="text-red-500 text-xs font-bold mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
             </div>

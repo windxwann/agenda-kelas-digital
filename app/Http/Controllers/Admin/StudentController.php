@@ -21,7 +21,12 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::role('siswa')->with('class');
+        // Optimasi query dengan select kolom yang dibutuhkan saja
+        $query = User::role('siswa')
+            ->select('id', 'name', 'nis', 'nisn', 'gender', 'class_id', 'status', 'phone', 'email', 'tempat_lahir', 'tanggal_lahir', 'address', 'rt', 'rw', 'kelurahan', 'kecamatan')
+            ->with(['class' => function($q) {
+                $q->select('id', 'name', 'academic_year');
+            }]);
         
         // Filter berdasarkan kelas
         if ($request->has('class_id') && $request->class_id) {
@@ -38,22 +43,33 @@ class StudentController extends Controller
             $query->where('status', $request->status);
         }
         
-        // Search
-        if ($request->has('search') && $request->search) {
-            $query->where(function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('nis', 'like', '%' . $request->search . '%');
+        // Search dengan optimasi indeks (hanya jika input minimal 2 karakter)
+        if ($request->has('search') && $request->search && strlen($request->search) >= 2) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('nis', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('nisn', 'like', '%' . $searchTerm . '%');
             });
         }
         
-        $students = $query->orderByRaw('LOWER(name) ASC')->paginate(50);
-        $classList = Classes::all();
+        // Pagination dinamis untuk performa optimal dengan 1600+ siswa
+        $perPage = $request->has('per_page') ? (int)$request->per_page : 25;
+        $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 25;
         
-        // Statistik untuk dashboard index
-        $maleCount = User::role('siswa')->where('gender', 'L')->count();
-        $femaleCount = User::role('siswa')->where('gender', 'P')->count();
+        // Order by class dan nama untuk konsistensi
+        $students = $query->orderBy('class_id')->orderByRaw('LOWER(name) ASC')->paginate($perPage);
         
-        return view('admin.students.index', compact('students', 'classList', 'maleCount', 'femaleCount'));
+        // Load statistik dengan caching 1 jam untuk mengurangi beban database
+        $classList = Classes::select('id', 'name', 'academic_year')->get();
+        $maleCount = cache()->remember('stats_male_students', 3600, function() {
+            return User::role('siswa')->where('gender', 'L')->count();
+        });
+        $femaleCount = cache()->remember('stats_female_students', 3600, function() {
+            return User::role('siswa')->where('gender', 'P')->count();
+        });
+        
+        return view('admin.students.index', compact('students', 'classList', 'maleCount', 'femaleCount', 'perPage'));
     }
 
     /**

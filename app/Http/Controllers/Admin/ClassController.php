@@ -17,10 +17,17 @@ class ClassController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Classes::with(['homeroomTeacher', 'students'])
+        // Optimasi query dengan select kolom yang dibutuhkan dan eager loading
+        $query = Classes::with(['homeroomTeacher' => function($q) {
+                $q->select('id', 'name', 'nip');
+            }, 'students' => function($q) {
+                $q->select('id', 'class_id');
+            }])
+            ->select('id', 'name', 'major', 'grade_level', 'academic_year', 'homeroom_teacher_id', 'capacity', 'description', 'is_active')
             ->withCount('students');
 
-        if ($request->filled('search')) {
+        // Search dengan optimasi (minimal 2 karakter)
+        if ($request->filled('search') && strlen($request->search) >= 2) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -28,9 +35,13 @@ class ClassController extends Controller
             });
         }
 
-        $classList = $query->orderBy('academic_year', 'desc')->orderBy('name', 'asc')->paginate(10);
+        // Pagination dinamis untuk performa optimal
+        $perPage = $request->has('per_page') ? (int)$request->per_page : 25;
+        $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 25;
+
+        $classList = $query->orderBy('academic_year', 'desc')->orderBy('name', 'asc')->paginate($perPage);
             
-        return view('admin.classes.index', compact('classList'));
+        return view('admin.classes.index', compact('classList', 'perPage'));
     }
 
     /**

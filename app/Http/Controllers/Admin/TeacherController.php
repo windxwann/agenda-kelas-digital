@@ -19,20 +19,30 @@ class TeacherController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::role('teacher')->with('subjects');
+        // Optimasi query dengan select kolom yang dibutuhkan dan eager loading
+        $query = User::role('teacher')
+            ->select('id', 'name', 'email', 'nip', 'phone', 'address', 'created_at')
+            ->with(['subjects' => function($q) {
+                $q->select('id', 'name', 'teacher_id');
+            }]);
         
-        // Search
-        if ($request->has('search') && $request->search) {
-            $query->where(function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('nip', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
+        // Search dengan optimasi (minimal 2 karakter)
+        if ($request->has('search') && $request->search && strlen($request->search) >= 2) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('nip', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('email', 'like', '%' . $searchTerm . '%');
             });
         }
         
-        $teachers = $query->latest()->paginate(10);
+        // Pagination dinamis untuk performa optimal
+        $perPage = $request->has('per_page') ? (int)$request->per_page : 25;
+        $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 25;
         
-        return view('admin.teachers.index', compact('teachers'));
+        $teachers = $query->latest()->paginate($perPage);
+        
+        return view('admin.teachers.index', compact('teachers', 'perPage'));
     }
 
     /**

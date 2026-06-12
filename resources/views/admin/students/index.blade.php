@@ -151,7 +151,7 @@
                     </svg>
                 </div>
                 <input type="text" name="search" value="{{ request('search') }}" 
-                       placeholder="Cari nama atau NIS siswa..." 
+                       placeholder="Cari nama, NIS, atau NISN siswa..." 
                        class="block w-full pl-12 pr-4 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
             </div>
 
@@ -200,6 +200,20 @@
                     </div>
                 </div>
 
+                <!-- Per Page Selector -->
+                <div class="relative w-full sm:w-32">
+                    <select name="per_page" onchange="this.form.submit()" 
+                            class="appearance-none block w-full pl-4 pr-10 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
+                        <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10/hal</option>
+                        <option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25/hal</option>
+                        <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50/hal</option>
+                        <option value="100" {{ $perPage == 100 ? 'selected' : '' }}>100/hal</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+
                 <!-- Reset Button -->
                 @if(request()->anyFilled(['search', 'class_id', 'gender', 'status']))
                     <a href="{{ route('admin.students.index') }}" 
@@ -231,8 +245,8 @@
         @endif
     </div>
     
-    <!-- Tabel Siswa dengan Scroll -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <!-- Tabel Siswa dengan Scroll - Desktop View -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden md:block">
         <div class="overflow-x-auto" style="max-height: 60vh; overflow-y: auto;">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50 sticky top-0 z-10 border-b border-gray-200 shadow-sm">
@@ -384,6 +398,147 @@
             <div>
                 {{ $students->appends(request()->query())->links() }}
             </div>
+        </div>
+        @endif
+    </div>
+    
+    <!-- Mobile Card View -->
+    <div class="md:hidden space-y-3">
+        @forelse($students as $student)
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:border-blue-200 transition-all duration-200">
+            <!-- Header Card -->
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center text-blue-600 font-bold text-lg border border-blue-100">
+                        {{ strtoupper(substr($student->name, 0, 1)) }}
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-base">{{ $student->name }}</h3>
+                        <p class="text-xs text-gray-500 font-mono">NIS: {{ $student->nis }}</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <a href="{{ route('admin.students.show', $student) }}" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    </a>
+                    <a href="{{ route('admin.students.edit', $student) }}" class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Info Grid -->
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div class="bg-gray-50 rounded-xl p-2.5">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Kelas</p>
+                    <p class="text-sm font-bold text-gray-900">{{ $student->class->name ?? '-' }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-2.5">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Status</p>
+                    @if($student->status == 'active')
+                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold bg-green-50 text-green-700 border border-green-100">
+                            <span class="w-1.5 h-1.5 mr-1 rounded-full bg-green-500"></span>
+                            Aktif
+                        </span>
+                    @elseif($student->status == 'graduated')
+                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                            <span class="w-1.5 h-1.5 mr-1 rounded-full bg-indigo-500"></span>
+                            Lulus
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold bg-red-50 text-red-700 border border-red-100">
+                            <span class="w-1.5 h-1.5 mr-1 rounded-full bg-red-500"></span>
+                            Non-Aktif
+                        </span>
+                    @endif
+                </div>
+                <div class="bg-gray-50 rounded-xl p-2.5">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Gender</p>
+                    @if($student->gender == 'L')
+                        <span class="text-sm font-bold text-blue-700">Laki-laki</span>
+                    @elseif($student->gender == 'P')
+                        <span class="text-sm font-bold text-pink-700">Perempuan</span>
+                    @else
+                        <span class="text-gray-400">-</span>
+                    @endif
+                </div>
+                <div class="bg-gray-50 rounded-xl p-2.5">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">NISN</p>
+                    <p class="text-sm font-bold font-mono text-gray-700">{{ $student->nisn ?? '-' }}</p>
+                </div>
+            </div>
+            
+            <!-- Additional Info -->
+            <div class="border-t border-gray-100 pt-3 space-y-2">
+                @if($student->tempat_lahir || $student->tanggal_lahir)
+                <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <div class="text-xs">
+                        <p class="font-medium text-gray-900">{{ $student->tempat_lahir ?? '-' }}</p>
+                        <p class="text-gray-500">{{ $student->tanggal_lahir ? \Carbon\Carbon::parse($student->tanggal_lahir)->translatedFormat('d M Y') : '-' }}</p>
+                    </div>
+                </div>
+                @endif
+                
+                @if($student->phone)
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                    <p class="text-xs text-gray-700">{{ $student->phone }}</p>
+                </div>
+                @endif
+                
+                @if($student->address)
+                <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <p class="text-xs text-gray-700 line-clamp-2">{{ $student->address }}</p>
+                </div>
+                @endif
+            </div>
+            
+            <!-- Delete Action for Mobile -->
+            <div class="border-t border-gray-100 mt-3 pt-3">
+                <form action="{{ route('admin.students.destroy', $student) }}" method="POST" class="w-full" onsubmit="return confirm('Yakin ingin menghapus siswa {{ $student->name }}?')">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Hapus Siswa
+                    </button>
+                </form>
+            </div>
+        </div>
+        @empty
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+            <div class="flex flex-col items-center text-gray-400">
+                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <p class="text-lg font-medium">Belum ada data siswa</p>
+                <a href="{{ route('admin.students.create') }}" class="mt-4 text-blue-600 hover:underline">Tambah siswa baru</a>
+            </div>
+        </div>
+        @endforelse
+        
+        <!-- Mobile Pagination -->
+        @if($students->hasPages())
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <div class="text-sm text-gray-500 font-medium text-center mb-3">
+                Menampilkan {{ $students->firstItem() }} - {{ $students->lastItem() }} dari {{ $students->total() }} siswa
+            </div>
+            {{ $students->appends(request()->query())->links() }}
         </div>
         @endif
     </div>

@@ -65,15 +65,29 @@
                        class="block w-full pl-12 pr-4 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm">
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-2">
+            <!-- Per Page Selector & Action Buttons -->
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
+                <!-- Per Page Selector -->
+                <div class="relative w-full sm:w-32">
+                    <select name="per_page" onchange="this.form.submit()" 
+                            class="appearance-none block w-full pl-4 pr-10 py-3.5 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm font-semibold text-gray-700">
+                        <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10/hal</option>
+                        <option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25/hal</option>
+                        <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50/hal</option>
+                        <option value="100" {{ $perPage == 100 ? 'selected' : '' }}>100/hal</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+
                 <button type="submit" class="inline-flex items-center px-6 py-3.5 text-sm font-semibold text-white bg-gray-800 rounded-xl hover:bg-gray-900 transition-all duration-200">
                     Cari Data
                 </button>
-                @if(request('search'))
+                @if(request('search') || request('per_page'))
                     <a href="{{ route('admin.teachers.index') }}" 
                        class="inline-flex items-center justify-center p-3.5 text-red-500 hover:bg-red-50 rounded-xl transition-all" 
-                       title="Reset Pencarian">
+                       title="Reset Filter">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -189,8 +203,13 @@
         </div>
         
         @if($teachers->hasPages())
-        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
-            {{ $teachers->appends(request()->query())->links() }}
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="text-sm text-gray-500 font-medium">
+                Menampilkan {{ $teachers->firstItem() }} - {{ $teachers->lastItem() }} dari {{ $teachers->total() }} guru
+            </div>
+            <div>
+                {{ $teachers->appends(request()->query())->links() }}
+            </div>
         </div>
         @endif
     </div>
